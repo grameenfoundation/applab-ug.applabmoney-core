@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<project name="Ant-AppLabMoneyRxService" default="main" basedir=".">
+	<!-- Sets variables which can later be used. -->
+	<!-- The value of a property is accessed via ${} -->
+	<property name="src.dir" location="src" />
+	<property name="build.dir" location="build" />
+	<property name="dist.dir" location="dist" />
+	<property name="docs.dir" location="docs" />
+	<property name="lib.dir" location="lib"/>
+	<property name="author.names" value="Moses Oscar Muhahala" />
+
+	<!-- Deletes the existing build, docs and dist directory-->
+	<!-- OMM: Use taskname attribute to change what displays in log e.g. [del] xxxxxx -->
+	<target name="clean" description="Delete existing Build Directories">
+		<delete dir="${build.dir}" taskname="del"/>
+		<delete dir="${docs.dir}" taskname="del" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<!-- Creates the  build, docs and dist directory-->
+	<target name="makedir" description="Create Build Directories">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${docs.dir}" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+
+	<!-- Compiles the java code (including the usage of library for JUnit -->
+	<target name="compile" depends="clean, makedir" description="Compile the Source-Code">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" fork="yes" executable="C:\Program Files\Java\jdk1.6.0_23\bin\javac.exe" includeantruntime="false"
+		 classpath="C:\oracle\product\10.2.0\db_2\jdbc\lib\ojdbc14.jar"	>
+		</javac>
+	</target>
+
+	<!-- Creates Javadoc -->
+	<!--<target name="docs" depends="compile">
+		<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">-->
+			 <!--Define which files / directory should get included, we include all -->
+			<!--<fileset dir="${src.dir}">
+				<include name="**" />
+			</fileset>
+		</javadoc>
+	</target>-->
+
+	<!--Creates the deployable jar file  -->
+	<target name="jar" depends="compile" description="Create a JAR File">
+		<jar destfile="${dist.dir}\applabmoneycore.jar" basedir="${build.dir}">
+			<manifest>
+				<section name="org/applab/AppLabMoneyCore">
+					<attribute name="Sealed" value="true" />
+				</section>				
+				<!-- Who is building this jar: ${user.name} will get the defined user? -->
+				<attribute name="Built-By" value="${author.names}"/>
+				<attribute name="Specification-Title" value="AppLab Money Core" />
+				<attribute name="Specification-Version" value="1.0.0.1" />
+				<attribute name="Specification-Vendor" value="AppLab Uganda" />
+				<attribute name="Implementation-Title" value="org.applab.AppLabMoneyCore" />
+				<attribute name="Implementation-Version" value="1.0.0.1" />
+				<attribute name="Implementation-Vendor" value="AppLab Uganda" />
+				<attribute name="Main-Class" value="org.applab.AppLabMoneyWsReceiver.AppLabMoneyRxServiceHost" />				
+			</manifest>
+		</jar>
+	</target>	
+
+	<!-- Run the Application by calling Java.exe -->
+	<target name="run" depends="jar" description="Run the Application from the JAR">
+        <java  fork="true" jar="${dist.dir}\applabmoneycore.jar" taskname="AppLabMoneyCore">
+        	<!-- Use jvmarg to increase JVM Heap size -->
+        	<jvmarg value="-Xmx1024m"/>
+            <!--<classpath>
+                <path refid="classpath"/>
+                <path id="application" location="${jar.dir}/${ant.project.name}.jar"/>
+            </classpath>-->
+        </java>
+    </target>
+
+	<target name="main" depends="compile, jar, run">
+		<description>Main target</description>
+	</target>
+
+</project>
