@@ -73,15 +73,14 @@ public class DatabaseHelper {
             // Otherwise create the connection
             Class.forName("com.mysql.jdbc.Driver").newInstance();
 
-            //conn = DriverManager.getConnection(mySqlConnectionString);
-            conn = DriverManager.getConnection("jdbc:mysql://localhost/applabmoney?" +
-                    "user=root&password=paradigmadmin");
+            conn = DriverManager.getConnection(mySqlConnectionString);
+            //conn = DriverManager.getConnection("jdbc:mysql://localhost/applabmoney?" +
+              //      "user=root&password=paradigmadmin");
             
             
             //DatabaseHelper.writeToLogFile("console", "DB CONNECTION STR->" + mySqlConnectionString);
             return conn;
-        }
-        catch (Exception ex) {            
+		}        catch (Exception ex) {            
             DatabaseHelper.writeToLogFile("console", "DatabaseHelper::getMySqlConnection->CONNSTR=" + mySqlConnectionString + ": ERR->" + ex.getMessage() + " TRACE: " + ex.getStackTrace());
             return conn;
         }

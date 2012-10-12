@@ -24,13 +24,15 @@
 		<mkdir dir="${dist.dir}" />
 	</target>
 
-	<!-- Compiles the java code (including the usage of library for JUnit -->
-	<target name="compile" depends="clean, makedir" description="Compile the Source-Code">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" fork="yes" executable="C:\Program Files\Java\jdk1.6.0_23\bin\javac.exe" includeantruntime="false"
-		 classpath="C:\oracle\product\10.2.0\db_2\jdbc\lib\ojdbc14.jar"	>
+	<!-- Compiles the java code (including the usage of library for JUnit -->	
+	
+	<target name="compile" depends="clean, makedir" description="compile the source ">
+	    <javac srcdir="${src.dir}" destdir="${build.dir}" fork="yes" executable="C:\Program Files\Java\jdk1.6.0_23\bin\javac.exe" includeantruntime="false"
+			classpath="C:\oracle\product\10.2.0\db_2\jdbc\lib\ojdbc14.jar" >
 		</javac>
-	</target>
 
+	</target>
+		<!-- classpath="C:\oracle\product\10.2.0\db_2\jdbc\lib\ojdbc14.jar" -->
 	<!-- Creates Javadoc -->
 	<!--<target name="docs" depends="compile">
 		<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">-->
