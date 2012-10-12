@@ -15,217 +15,230 @@ import oracle.jdbc.pool.*;
 
 public class DatabaseHelper {
 
-    private static OracleDataSource ods = null;
-    private static Connection conn = null;
+	private static OracleDataSource ods = null;
+	private static Connection conn = null;
 
-    private static String mySqlConnectionString = null;    
-   
-    public static void setMySqlConnectionString(String value) {
-        mySqlConnectionString = value;
-    }
+	private static String mySqlConnectionString = null;
 
-    public static Connection getConnection(String targetDatabase) throws NamingException, SQLException {
-        
-        if (targetDatabase.toUpperCase().equalsIgnoreCase("ORACLE")) {
-            return getOracleConnection();
-        }
-        else if (targetDatabase.toUpperCase().equalsIgnoreCase("MYSQL")) {
-            return getMySqlConnection();
-        }
-        else if (targetDatabase.toUpperCase().equalsIgnoreCase("MSSQL")) {
-            return getMsSqlConnection();
-        }
-        else {
-            return getMySqlConnection();
-        }
-    }
+	public static void setMySqlConnectionString(String value) {
+		mySqlConnectionString = value;
+	}
 
-    private static Connection getOracleConnection() throws NamingException, SQLException {
-        try {
-            if (conn != null && !conn.isClosed()) {
-                return conn;
-            }
-            // Otherwise create the connection
-            ods = new OracleDataSource();
-            ods.setUser("APPLABMONEY");
-            ods.setPassword("APPLABMONEY");
-            ods.setDriverType("thin");
-            ods.setDatabaseName("PBSLDB");
-            ods.setServerName("Moses-PC");
-            ods.setPortNumber(1521);
-            ods.setDescription("AppLab Money Database Schema");
-            conn = ods.getConnection();
+	public static Connection getConnection(String targetDatabase)
+			throws NamingException, SQLException {
 
-            return conn;
-        }
-        catch (SQLException ex) {
-            DatabaseHelper.writeToLogFile("console", "ERR: " + ex.getMessage() + " TRACE: " + ex.getStackTrace());
-            return conn;
-        }
-    }
+		if (targetDatabase.toUpperCase().equalsIgnoreCase("ORACLE")) {
+			return getOracleConnection();
+		} else if (targetDatabase.toUpperCase().equalsIgnoreCase("MYSQL")) {
+			return getMySqlConnection();
+		} else if (targetDatabase.toUpperCase().equalsIgnoreCase("MSSQL")) {
+			return getMsSqlConnection();
+		} else {
+			return getMySqlConnection();
+		}
+	}
 
-    private static Connection getMySqlConnection() throws NamingException, SQLException {
-        try {
-            if (conn != null && !conn.isClosed()) {
-                return conn;
-            }
+	private static Connection getOracleConnection() throws NamingException,
+			SQLException {
+		try {
+			if (conn != null && !conn.isClosed()) {
+				return conn;
+			}
+			// Otherwise create the connection
+			ods = new OracleDataSource();
+			ods.setUser("APPLABMONEY");
+			ods.setPassword("APPLABMONEY");
+			ods.setDriverType("thin");
+			ods.setDatabaseName("PBSLDB");
+			ods.setServerName("Moses-PC");
+			ods.setPortNumber(1521);
+			ods.setDescription("AppLab Money Database Schema");
+			conn = ods.getConnection();
 
-            // Otherwise create the connection
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+			return conn;
+		} catch (SQLException ex) {
+			DatabaseHelper.writeToLogFile("console", "ERR: " + ex.getMessage()
+					+ " TRACE: " + ex.getStackTrace());
+			return conn;
+		}
+	}
 
-            conn = DriverManager.getConnection(mySqlConnectionString);
-            //conn = DriverManager.getConnection("jdbc:mysql://localhost/applabmoney?" +
-              //      "user=root&password=paradigmadmin");
-            
-            
-            //DatabaseHelper.writeToLogFile("console", "DB CONNECTION STR->" + mySqlConnectionString);
-            return conn;
-		}        catch (Exception ex) {            
-            DatabaseHelper.writeToLogFile("console", "DatabaseHelper::getMySqlConnection->CONNSTR=" + mySqlConnectionString + ": ERR->" + ex.getMessage() + " TRACE: " + ex.getStackTrace());
-            return conn;
-        }
-    }
+	private static Connection getMySqlConnection() throws NamingException,
+			SQLException {
+		try {
+			if (conn != null && !conn.isClosed()) {
+				return conn;
+			}
 
-    private static Connection getMsSqlConnection() throws NamingException, SQLException {
-        try {
-            if (conn != null && !conn.isClosed()) {
-                return conn;
-            }
-            // Otherwise create the connection
-            ods = new OracleDataSource();
-            ods.setUser("APPLABMONEY");
-            ods.setPassword("APPLABMONEY");
-            ods.setDriverType("thin");
-            ods.setDatabaseName("PBSLDB");
-            ods.setServerName("Moses-PC");
-            ods.setPortNumber(1521);
-            ods.setDescription("AppLab Money Database Schema");
-            conn = ods.getConnection();
+			// Otherwise create the connection
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
 
-            return conn;
-        }
-        catch (SQLException ex) {
-            DatabaseHelper.writeToLogFile("console", "ERR: " + ex.getMessage() + " TRACE: " + ex.getStackTrace());
-            return conn;
-        }
-    }
+			conn = DriverManager.getConnection(mySqlConnectionString);
+			// conn = DriverManager
+			// .getConnection("jdbc:mysql://localhost/applabmoney?"
+			// + "user=root&password=g5*vTys-D2");
 
-    public static void writeToLogFile(String targetFolder, String theData) {
-        File targetFile = null;
-        File targetDirectory = null;
-        String logDirectoryPath = null;
-        String fileName = null;
-        String timestamp = null;
-        String finalRecordData = null;
-        FileOutputStream strm = null;
+			// DatabaseHelper.writeToLogFile("console", "DB CONNECTION STR->" +
+			// mySqlConnectionString);
+			return conn;
+		} catch (Exception ex) {
+			DatabaseHelper
+					.writeToLogFile(
+							"console",
+							"DatabaseHelper::getMySqlConnection->CONNSTR="
+									+ mySqlConnectionString + ": ERR->"
+									+ ex.getMessage() + " TRACE: "
+									+ ex.getStackTrace());
+			return conn;
+		}
+	}
 
-        try {
-            if (targetFolder.compareToIgnoreCase("console") == 0) {
-                // Write on the Console Window
-                System.out.println(theData);
-            }
-            else {
-                // Write to the File and the specified targetFolder
-                logDirectoryPath = new File("Log").getAbsolutePath();
+	private static Connection getMsSqlConnection() throws NamingException,
+			SQLException {
+		try {
+			if (conn != null && !conn.isClosed()) {
+				return conn;
+			}
+			// Otherwise create the connection
+			ods = new OracleDataSource();
+			ods.setUser("APPLABMONEY");
+			ods.setPassword("APPLABMONEY");
+			ods.setDriverType("thin");
+			ods.setDatabaseName("PBSLDB");
+			ods.setServerName("Moses-PC");
+			ods.setPortNumber(1521);
+			ods.setDescription("AppLab Money Database Schema");
+			conn = ods.getConnection();
 
-                // Now build the FileName based on the time
-                long currentTime = System.currentTimeMillis();
-                Date dateTime = new Date(currentTime);
-                fileName = String.format("%1$td%1$tb%1$tY@%1$tH00.txt", dateTime);
+			return conn;
+		} catch (SQLException ex) {
+			DatabaseHelper.writeToLogFile("console", "ERR: " + ex.getMessage()
+					+ " TRACE: " + ex.getStackTrace());
+			return conn;
+		}
+	}
 
-                // Target Folder
-                targetDirectory = new File(logDirectoryPath + File.separator + targetFolder);
+	public static void writeToLogFile(String targetFolder, String theData) {
+		File targetFile = null;
+		File targetDirectory = null;
+		String logDirectoryPath = null;
+		String fileName = null;
+		String timestamp = null;
+		String finalRecordData = null;
+		FileOutputStream strm = null;
 
-                // If it doesn't exist create it
-                if (!targetDirectory.exists()) {
-                    boolean retVal = targetDirectory.mkdirs();
-                    if (!retVal) {
-                        // A problem occurred. For now just exit.
-                        return;
-                    }
-                }
+		try {
+			if (targetFolder.compareToIgnoreCase("console") == 0) {
 
-                // Create the file
-                targetFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
+				// Write on the Console Window
+				System.out.println(theData);
+			} else {
 
-                // Append Time and Line Separator to the Data Record
-                timestamp = String.format("[%1$tH:%1$tM:%1$tS]", dateTime);
-                finalRecordData = String.format("%s %s%s", timestamp, theData.trim(), "\r\n");
+				// Write to the File and the specified targetFolder
+				logDirectoryPath = new File("Log").getAbsolutePath();
 
-                // Now Write the Record to the file
-                strm = new FileOutputStream(targetFile, true);
-                new PrintStream(strm).print(finalRecordData);
+				// Now build the FileName based on the time
+				long currentTime = System.currentTimeMillis();
+				Date dateTime = new Date(currentTime);
+				fileName = String.format("%1$td%1$tb%1$tY@%1$tH00.txt",
+						dateTime);
 
-                // close the stream
-                strm.close();
-            }
-        }
-        catch (Exception ex) {
-            System.err.println("ERR: " + ex.getMessage() + " TRACE: " + ex.getStackTrace());
-        }
-        finally {
-            if (strm != null) {
-                try {
-                    strm.close();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+				// Target Folder
+				targetDirectory = new File(logDirectoryPath + File.separator
+						+ targetFolder);
 
-    /*
-     * Procedure to log the outbound messages into the database
-     */
-    public static boolean logOutBoundMessage(String referenceId, String destMsisdn, String messageText, String deliveryStatus)
-            throws SQLException {
-        Connection cn = null;
-        PreparedStatement stm = null;
-        StringBuilder sb = null;
-        int dbStatusCode = 0;
-        String sqlQuery = "";
+				// If it doesn't exist create it
+				if (!targetDirectory.exists()) {
+					boolean retVal = targetDirectory.mkdirs();
+					if (!retVal) {
+						// A problem occurred. For now just exit.
+						return;
+					}
+				}
 
-        try {
-            // If the data fields are empty, return false
-            if (destMsisdn.trim().isEmpty() || referenceId.trim().isEmpty() || messageText.trim().isEmpty()) {
-                return false;
-            }
+				// Create the file
+				targetFile = new File(targetDirectory.getAbsolutePath()
+						+ File.separator + fileName);
 
-            if (deliveryStatus.trim().isEmpty()) {
-                deliveryStatus = "FAILED";
-            }
+				// Append Time and Line Separator to the Data Record
+				timestamp = String.format("[%1$tH:%1$tM:%1$tS]", dateTime);
+				finalRecordData = String.format("%s %s%s", timestamp,
+						theData.trim(), "\r\n");
 
-            // Otherwise, get the Connection
-            cn = DatabaseHelper.getConnection(HelperUtils.TARGET_DATABASE);
+				// Now Write the Record to the file
+				strm = new FileOutputStream(targetFile, true);
+				new PrintStream(strm).print(finalRecordData);
 
-            sb = new StringBuilder();
-            sb.append("INSERT INTO OUTBOUND_MESSAGES(OUTBOUND_MESSAGE_ID, REFERENCE_ID, CREATED_TIMESTAMP, DEST_MSISDN, MESSAGE, DELIVERY_STATUS) ");
-            sb.append(" VALUES(NULL, '%s', SYSDATE(), '%s', '%s', '%s')");
-            sqlQuery = sb.toString();
+				// close the stream
+				strm.close();
+			}
+		} catch (Exception ex) {
+			System.err.println("ERR: " + ex.getMessage() + " TRACE: "
+					+ ex.getStackTrace());
+		} finally {
+			if (strm != null) {
+				try {
+					strm.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
-            stm = cn.prepareStatement(String.format(sqlQuery, referenceId, destMsisdn, messageText, deliveryStatus));
+	/*
+	 * Procedure to log the outbound messages into the database
+	 */
+	public static boolean logOutBoundMessage(String referenceId,
+			String destMsisdn, String messageText, String deliveryStatus)
+			throws SQLException {
+		Connection cn = null;
+		PreparedStatement stm = null;
+		StringBuilder sb = null;
+		int dbStatusCode = 0;
+		String sqlQuery = "";
 
-            // Execute the Query
-            dbStatusCode = stm.executeUpdate();
-            
-            cn.commit();
+		try {
+			// If the data fields are empty, return false
+			if (destMsisdn.trim().isEmpty() || referenceId.trim().isEmpty()
+					|| messageText.trim().isEmpty()) {
+				return false;
+			}
 
-            return ((dbStatusCode > 0) ? true : false);
-        }
-        catch (Exception ex) {
-            HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage() + " TRACE: " + ex.getStackTrace());
-            return false;
-        }
-        finally {
-            if (cn != null) {
-                cn.close();
-            }
+			if (deliveryStatus.trim().isEmpty()) {
+				deliveryStatus = "FAILED";
+			}
 
-            if (stm != null) {
-                stm.close();
-            }
-        }
-    }
+			// Otherwise, get the Connection
+			cn = DatabaseHelper.getConnection(HelperUtils.TARGET_DATABASE);
+
+			sb = new StringBuilder();
+			sb.append("INSERT INTO OUTBOUND_MESSAGES(OUTBOUND_MESSAGE_ID, REFERENCE_ID, CREATED_TIMESTAMP, DEST_MSISDN, MESSAGE, DELIVERY_STATUS) ");
+			sb.append(" VALUES(NULL, '%s', SYSDATE(), '%s', '%s', '%s')");
+			sqlQuery = sb.toString();
+
+			stm = cn.prepareStatement(String.format(sqlQuery, referenceId,
+					destMsisdn, messageText, deliveryStatus));
+
+			// Execute the Query
+			dbStatusCode = stm.executeUpdate();
+
+			cn.commit();
+
+			return ((dbStatusCode > 0) ? true : false);
+		} catch (Exception ex) {
+			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
+					+ " TRACE: " + ex.getStackTrace());
+			return false;
+		} finally {
+			if (cn != null) {
+				cn.close();
+			}
+
+			if (stm != null) {
+				stm.close();
+			}
+		}
+	}
 
 }

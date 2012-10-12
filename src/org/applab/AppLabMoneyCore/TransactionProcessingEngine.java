@@ -2044,29 +2044,19 @@ public class TransactionProcessingEngine {
 
 			// Validate the GoalType or Name: Use Index from behind
 			goalType = transElements[transElements.length - 3].trim();
-			MeToMeGoals activeGoals = MeToMeGoals
-					.getActiveGoalsByCustomerAndGoalType(
-							destCustInfo.getCustomerId(), goalType);
+			// MeToMeGoals activeGoals = MeToMeGoals
+			// .getActiveGoalsByCustomerAndGoalType(
+			// destCustInfo.getCustomerId(), goalType);
 
 			// Pick all active goals regardless of type
 			MeToMeGoals allActiveGoals = MeToMeGoals
 					.getActiveGoalsByCustomerId(destCustInfo.getCustomerId());
 
-			if (activeGoals.size() < 1) {
+			if ((allActiveGoals.isEmpty()) && (allActiveGoals.size() < 1)) {
 				if (isOwnPayment) {
-					if ((!(allActiveGoals.isEmpty()))
-							&& (!(allActiveGoals.size() < 1))) {
-						this.destMessage = String
-								.format("The goal selected doesnot exist.You only have the %s goal active.",
-										allActiveGoals.get(0).getGoalName()
-												.toUpperCase());
-						HelperUtils.sendSMS(sourceMsisdn, destMessage,
-								referenceId);
-					} else {
-						this.destMessage = "The goal selected doesnot exist. Please create a new goal.";
-						HelperUtils.sendSMS(sourceMsisdn, destMessage,
-								referenceId);
-					}
+					this.destMessage = "The goal selected does not exist. Please go to the main menu to create your goal.";
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
 				} else {
 					this.destMessage = String
 							.format("The Beneficiary %s does not have an Active %s Goal. Please ask the beneficiary to first create a goal.",
@@ -2114,9 +2104,73 @@ public class TransactionProcessingEngine {
 				return;
 			}
 
+			// if (activeGoals.size() < 1) {
+			// if (isOwnPayment) {
+			// if ((!(allActiveGoals.isEmpty()))
+			// && (!(allActiveGoals.size() < 1))) {
+			// this.destMessage = String
+			// .format("The goal selected does not exist. You only have the %s goal active.",
+			// allActiveGoals.get(0).getGoalName()
+			// .toUpperCase());
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage,
+			// referenceId);
+			// } else {
+			// this.destMessage =
+			// "The goal selected does not exist. Please go to the main menu to create your goal.";
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage,
+			// referenceId);
+			// }
+			// } else {
+			// this.destMessage = String
+			// .format("The Beneficiary %s does not have an Active %s Goal. Please ask the beneficiary to first create a goal.",
+			// CustomerInformation.getDisplayNames(
+			// destCustInfo, false).toUpperCase(),
+			// goalType.toUpperCase());
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+			//
+			// // Notify the Beneficiary Customer
+			// if (allActiveGoals.size() < 1) {
+			// this.destMessage = String
+			// .format("The Sponsor %s attempted to Pay %,.0f%s into your %s Goal, but you do not have any active goals. Please first create the goal then notify the sponsor.",
+			// CustomerInformation.getDisplayNames(
+			// sourceCustInfo, false)
+			// .toUpperCase(), amount,
+			// SystemConfigInfo.getCurrencyCode(),
+			// goalType.toUpperCase());
+			// HelperUtils.sendSMS(destMsisdn, destMessage,
+			// referenceId);
+			// } else {
+			// // Get the Active Goals
+			// String activeGoalsList = "";
+			// for (int goalsIndex = 0; goalsIndex < allActiveGoals
+			// .size(); goalsIndex++) {
+			// activeGoalsList = activeGoalsList
+			// .concat(allActiveGoals.get(goalsIndex)
+			// .getGoalName());
+			//
+			// if (goalsIndex < allActiveGoals.size() - 1) {
+			// activeGoalsList = activeGoalsList.concat(";");
+			// }
+			// }
+			// this.destMessage = String
+			// .format("The Sponsor %s attempted to Pay %,.0f%s into your %s Goal, but your Active goals are: %s. Please notify the sponsor.",
+			// CustomerInformation.getDisplayNames(
+			// sourceCustInfo, false)
+			// .toUpperCase(), amount,
+			// SystemConfigInfo.getCurrencyCode(),
+			// goalType.toUpperCase(), activeGoalsList
+			// .toUpperCase());
+			// HelperUtils.sendSMS(destMsisdn, destMessage,
+			// referenceId);
+			// }
+			// }
+			// return;
+			// }
+
 			// Otherwise, Pick the First Goal Type: There will always be 1 goal
 			// per category for now
-			targetGoal = activeGoals.get(0);
+			// targetGoal = activeGoals.get(0);
+			targetGoal = allActiveGoals.get(0);
 
 			if (this.sourceCustInfo.getAccountInfo() == null
 					|| this.sourceCustInfo.getAccountInfo().getBookBalance() < amount) {
@@ -2266,27 +2320,36 @@ public class TransactionProcessingEngine {
 
 			// Validate the GoalType or Name
 			goalType = transElements[1].trim();
-			MeToMeGoals activeGoals = MeToMeGoals
-					.getActiveGoalsByCustomerAndGoalType(
-							sourceCustInfo.getCustomerId(), goalType);
-			if (activeGoals.size() < 1) {
-				// || (null == activeGoals.get(0))) {
-				this.destMessage = String
-						.format("You do not have an Active Goal for: %s. You must first create a goal.",
-								goalType.toUpperCase());
+			// MeToMeGoals activeGoals = MeToMeGoals
+			// .getActiveGoalsByCustomerAndGoalType(
+			// sourceCustInfo.getCustomerId(), goalType);
+			// if (activeGoals.size() < 1) {
+			// this.destMessage = String
+			// .format("You do not have an Active Goal for: %s. Please go to the main menu to create your goal.",
+			// goalType.toUpperCase());
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+			// return;
+			// }
+
+			// Pick the First Goal Type: There will always be 1 goal per
+			// category for now
+			// targetGoal = activeGoals.get(0);
+
+			// Pick all active goals regardless of type
+			MeToMeGoals allActiveGoals = MeToMeGoals
+					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
+
+			if ((allActiveGoals.isEmpty()) && (allActiveGoals.size() < 1)) {
+				this.destMessage = "You do not have any active goal. Please go to the main menu to create your goal.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
-			// Pick the First Goal Type: There will always be 1 goal per
-			// category for now
-			targetGoal = activeGoals.get(0);
+			targetGoal = allActiveGoals.get(0);
 
 			// Check again
 			if (null == targetGoal) {
-				this.destMessage = String
-						.format("You do not have an Active Goal for: %s. You must first create a goal.",
-								goalType.toUpperCase());
+				this.destMessage = "You do not have any active goal. Please go to the main menu to create your goal.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2415,29 +2478,40 @@ public class TransactionProcessingEngine {
 
 			// Validate the GoalType or Name
 			goalType = transElements[1].trim();
-			MeToMeGoals activeGoals = MeToMeGoals
-					.getActiveGoalsByCustomerAndGoalType(
-							sourceCustInfo.getCustomerId(), goalType);
+			// MeToMeGoals activeGoals = MeToMeGoals
+			// .getActiveGoalsByCustomerAndGoalType(
+			// sourceCustInfo.getCustomerId(), goalType);
 
 			// Pick the First Goal Type: There will always be 1 goal per
 			// category for now
-			if ((activeGoals.isEmpty())) {
+			// if ((activeGoals.isEmpty())) {
+			// this.destMessage =
+			// String.format("You do not have an Active Goal for: %s. Please go to the main menu to create your goal.",
+			// goalType.toUpperCase());
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+			// return;
+			// Pick all active goals regardless of type
+			MeToMeGoals allActiveGoals = MeToMeGoals
+					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
+
+			if ((allActiveGoals.isEmpty()) && (allActiveGoals.size() < 1)) {
 				this.destMessage = String
-						.format("You do not have an Active Goal for: %s. You must first create a goal.",
+						.format("You do not have an Active Goal for: %s. Please go to the main menu to create your goal.",
 								goalType.toUpperCase());
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
-			} else {
-				targetGoal = activeGoals.get(0);
 
+			} else {
+				// targetGoal = activeGoals.get(0);
+				targetGoal = allActiveGoals.get(0);
 				// Get the Transactions for the selected Goal
 				MeToMeGoalTransactions meToMeGoalTrans = targetGoal
 						.getGoalTransactions();
 
-				if ((targetGoal == null) || (activeGoals.size() < 1)
+				if ((targetGoal == null) || (allActiveGoals.size() < 1)
 						&& (unRedeemedGoals.size() < 1)) {
 					this.destMessage = String
-							.format("You do not have an Active Goal for: %s. You must first create a goal.",
+							.format("You do not have an Active Goal for: %s. Please go to the main menu to create your goal.",
 									goalType.toUpperCase());
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
@@ -2452,7 +2526,8 @@ public class TransactionProcessingEngine {
 					// Otherwise display the transactions
 					String smsMsg = meToMeGoalTrans.getTransactionsSms(4);
 					String smsMsgHeader = String.format(
-							" %s Goal Mini-Statement", goalType.toUpperCase());
+							" %s Goal Mini-Statement", targetGoal.getGoalName()
+									.toUpperCase());
 
 					this.destMessage = smsMsgHeader + "\r\n" + smsMsg;
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
@@ -2544,26 +2619,39 @@ public class TransactionProcessingEngine {
 			// Customer
 			goalType = transElements[1].trim();
 
-			MeToMeGoals activeGoals = MeToMeGoals
-					.getActiveGoalsByCustomerAndGoalType(
-							sourceCustInfo.getCustomerId(), goalType);
+			// MeToMeGoals activeGoals = MeToMeGoals
+			// .getActiveGoalsByCustomerAndGoalType(
+			// sourceCustInfo.getCustomerId(), goalType);
 
 			// Pick the First Goal Type: There will always be 1 goal per
 			// category for now
-			if ((activeGoals.isEmpty())) {
-				this.destMessage = String
-						.format("You do not have an Active Goal for: %s. You must first create a goal.",
-								goalType.toUpperCase());
+			// if ((activeGoals.isEmpty())) {
+			// this.destMessage = String
+			// .format("You do not have an Active Goal for: %s. Please go to the main menu to create your goal.",
+			// goalType.toUpperCase());
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+			// return;
+
+			MeToMeGoals allActiveGoals = MeToMeGoals
+					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
+
+			if ((allActiveGoals.isEmpty()) && (allActiveGoals.size() < 1)) {
+				this.destMessage = "You do not have any active goal. Please go to the main menu to create your goal.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			} else {
+				// targetGoal = activeGoals.get(0);
+				targetGoal = allActiveGoals.get(0);
+				// MeToMeGoals unRedeemedGoals = MeToMeGoals
+				// .getUnRedeemedGoalsByCustomerAndGoalType(
+				// sourceCustInfo.getCustomerId(), goalType);
 				MeToMeGoals unRedeemedGoals = MeToMeGoals
-						.getUnRedeemedGoalsByCustomerAndGoalType(
-								sourceCustInfo.getCustomerId(), goalType);
+						.getUnRedeemedGoalsByCustomer(sourceCustInfo
+								.getCustomerId());
 				if (unRedeemedGoals.size() < 1) {
 					this.destMessage = String
-							.format("You do not have an Active or Matured %s Goal. You must first create a goal.",
-									goalType.toUpperCase());
+							.format("You do not have an Active or Matured Goal. Please go to the main menu to create your goal.",
+									targetGoal.getGoalName().toUpperCase());
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				}
@@ -2574,9 +2662,7 @@ public class TransactionProcessingEngine {
 
 				// Check again
 				if (null == targetGoal) {
-					this.destMessage = String
-							.format("You do not have an Active or Matured %s Goal. You must first create a goal.",
-									goalType.toUpperCase());
+					this.destMessage = "You do not have any active goal. Please go to the main menu to create your goal.";
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				}
@@ -2610,7 +2696,7 @@ public class TransactionProcessingEngine {
 							.getTargetAmount())) {
 						this.destMessage = String
 								.format("Your %s goal can only be cashed out on %s or earlier if you reach %s%,.0f. You can make an early withdrawal from the me2me menu.",
-										goalType.toUpperCase(),
+										targetGoal.getGoalName().toUpperCase(),
 										df.format(targetGoal.getMaturityDate()),
 										currency, targetGoal.getTargetAmount());
 						HelperUtils.sendSMS(sourceMsisdn, destMessage,
@@ -2716,7 +2802,7 @@ public class TransactionProcessingEngine {
 		String separatorChar = " ";
 
 		try {
-		    HelperUtils.writeToLogFile("console", "RCVD:" + requestCommand);
+			HelperUtils.writeToLogFile("console", "RCVD:" + requestCommand);
 			String formedSrcMsisdn = convertMobileNoToMsisdn(this.sourceMsisdn);
 			if (formedSrcMsisdn.isEmpty()) {
 				this.destMessage = "You are not authorized to use this service.";
@@ -2808,7 +2894,8 @@ public class TransactionProcessingEngine {
 				return;
 			}
 
-			HelperUtils.writeToLogFile("console", "Calling function activateMe2Me");
+			HelperUtils.writeToLogFile("console",
+					"Calling function activateMe2Me");
 			boolean retActivateMe2Me = MeToMeCommon
 					.activateMe2Me(sourceCustInfo);
 
@@ -2817,8 +2904,9 @@ public class TransactionProcessingEngine {
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
-			
-			HelperUtils.writeToLogFile("console", "Sending Notification for Successful ACTV");
+
+			HelperUtils.writeToLogFile("console",
+					"Sending Notification for Successful ACTV");
 			this.destMessage = "You have successfully activated your Me2Me wallet. You can now create goals and make payments towards them.";
 			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 		} catch (Exception ex) {
@@ -2909,26 +2997,35 @@ public class TransactionProcessingEngine {
 			// Validate the GoalType or Name: get Active Goals for the Customer
 			goalType = transElements[1].trim();
 
-			MeToMeGoals activeGoals = MeToMeGoals
-					.getActiveGoalsByCustomerAndGoalType(
-							sourceCustInfo.getCustomerId(), goalType);
-			if (activeGoals.size() < 1) {
-				this.destMessage = String
-						.format("You do not have an Active %s Goal. You must first create a goal.",
-								goalType.toUpperCase());
+			// MeToMeGoals activeGoals = MeToMeGoals
+			// .getActiveGoalsByCustomerAndGoalType(
+			// sourceCustInfo.getCustomerId(), goalType);
+			// if (activeGoals.size() < 1) {
+			// this.destMessage = String
+			// .format("You do not have an Active %s Goal. Please go to the main menu to create your goal.",
+			// goalType.toUpperCase());
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+			// return;
+			// }
+
+			// Pick the First Goal Type: There will always be 1 goal per
+			// category for now
+			// targetGoal = activeGoals.get(0);
+
+			MeToMeGoals allActiveGoals = MeToMeGoals
+					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
+
+			if ((allActiveGoals.isEmpty()) && (allActiveGoals.size() < 1)) {
+				this.destMessage = "You do not have any active goal. Please go to the main menu to create your goal.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
-			// Pick the First Goal Type: There will always be 1 goal per
-			// category for now
-			targetGoal = activeGoals.get(0);
+			targetGoal = allActiveGoals.get(0);
 
 			// Check again
 			if (null == targetGoal) {
-				this.destMessage = String
-						.format("You do not have an Active %s Goal. You must first create a goal.",
-								goalType.toUpperCase());
+				this.destMessage = "You do not have any active goal. Please go to the main menu to create your goal.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2966,7 +3063,7 @@ public class TransactionProcessingEngine {
 					.getTargetAmount()) * 100;
 
 			this.destMessage = String
-					.format("REF: %s: The accumulated amount of %s%,.0f from your Stopped %s Goal was credited back into your main account. Your available balance in the main account is %,.0f%s.",
+					.format("REF: %s: The accumulated amount of %s%,.0f from your Stopped %s Goal was credited back into your main account. Your main account balance is %,.0f%s.",
 							referenceId, currency, accruedGoalBalance,
 							targetGoal.getGoalName().toUpperCase(),
 							bookBalance, currency);
@@ -2974,11 +3071,11 @@ public class TransactionProcessingEngine {
 
 			// I will have a function for doing the analysis on the savings and
 			// give the proper message
-			this.destMessage = String
-					.format("Unfortunately, you did not Incubate your %s Goal of %s%,.0f until maturity. You stopped at %.0f percent of your target. Please give us feedback of your experience to help us better the Me2Me Product Features.",
-							targetGoal.getGoalName().toUpperCase(), currency,
-							targetGoal.getTargetAmount(), achievedPercentage);
-			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+			// this.destMessage = String
+			// .format("Unfortunately, you did not Incubate your %s Goal of %s%,.0f until maturity. You stopped at %.0f percent of your target. Please give us feedback of your experience to help us better the Me2Me Product Features.",
+			// targetGoal.getGoalName().toUpperCase(), currency,
+			// targetGoal.getTargetAmount(), achievedPercentage);
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 		} catch (Exception ex) {
 			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
 					+ " TRACE: " + ex.getStackTrace());
@@ -3013,19 +3110,17 @@ public class TransactionProcessingEngine {
 
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
-			if (transElements.length < 4) {
+			if (transElements.length < 5) {
 				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
-			// pinCode = transElements[4];
-			pinCode = transElements[3];
+			pinCode = transElements[4];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
 			// swap the originalPassword with the maskedPassword
-			// transElements[4] = maskedPinCode;
-			transElements[3] = maskedPinCode;
+			transElements[4] = maskedPinCode;
 
 			// Reconstruct the Original string
 			String originalRequest = "";
@@ -3074,29 +3169,40 @@ public class TransactionProcessingEngine {
 			// Validate the GoalType or Name: get Active Goals for the Customer
 			goalType = transElements[1].trim();
 
-			MeToMeGoals activeGoals = MeToMeGoals
-					.getActiveGoalsByCustomerAndGoalType(
-							sourceCustInfo.getCustomerId(), goalType);
-			if (activeGoals.size() < 1) {
-				this.destMessage = String
-						.format("You do not have an Active %s Goal. You must first create a goal.",
-								goalType.toUpperCase());
+			// MeToMeGoals activeGoals = MeToMeGoals
+			// .getActiveGoalsByCustomerAndGoalType(
+			// sourceCustInfo.getCustomerId(), goalType);
+			// if (activeGoals.size() < 1) {
+			// this.destMessage = String
+			// .format("You do not have an Active %s Goal. Please go to the main menu to create your goal.",
+			// goalType.toUpperCase());
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+			// return;
+			// }
+
+			MeToMeGoals allActiveGoals = MeToMeGoals
+					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
+
+			if ((allActiveGoals.isEmpty()) && (allActiveGoals.size() < 1)) {
+				this.destMessage = "You do not have any active goal. Please go to the main menu to create your goal.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
-
 			// Pick the First Goal Type: There will always be 1 goal per
 			// category for now
-			targetGoal = activeGoals.get(0);
+			// targetGoal = activeGoals.get(0);
+
+			targetGoal = allActiveGoals.get(0);
 
 			// Check again
-			if (null == targetGoal) {
-				this.destMessage = String
-						.format("You do not have an Active %s Goal. You must first create a goal.",
-								goalType.toUpperCase());
-				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-				return;
-			}
+			// if (null == targetGoal) {
+			// this.destMessage = String
+			// .format("You do not have an Active %s Goal. Please go to the main menu to create your goal.",
+			// targetGoal.getGoalName().toUpperCase());
+			// goalType.toUpperCase());
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+			// return;
+			// }
 
 			// Check whether goal allows for liquidity
 			// if (targetGoal.getLiquidityOption().equalsIgnoreCase(
@@ -3116,8 +3222,7 @@ public class TransactionProcessingEngine {
 			// spaceChar);
 
 			// Process the Amount
-			// amountStr = transElements[3].trim();
-			amountStr = transElements[2].trim();
+			amountStr = transElements[3].trim();
 			try {
 				amount = Double.parseDouble(amountStr);
 			} catch (Exception exAmount) {
@@ -3220,7 +3325,7 @@ public class TransactionProcessingEngine {
 				double newAccruedGoalBalance = accruedGoalBalance - amount;
 
 				if (newAccruedGoalBalance == 0) {
-					
+
 					this.destMessage = String
 							.format("REF: %s: You have transferred all your funds, %s%,.0f from %s goal into main account.The goal has been CLOSED.\r\nMain Account Balance: %s%,.0f",
 									referenceId, currency, amount, targetGoal
@@ -3342,30 +3447,41 @@ public class TransactionProcessingEngine {
 			goalType = transElements[1];
 
 			// Check if goal exists
-			MeToMeGoals activeGoals = MeToMeGoals
-					.getActiveGoalsByCustomerAndGoalType(
-							sourceCustInfo.getCustomerId(), goalType);
-
-			if (activeGoals.size() < 1) {
-				this.destMessage = String
-						.format("You do not have an Active %s Goal. You must first create a goal.",
-								goalType.toUpperCase());
-				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-				return;
-			}
+			// MeToMeGoals activeGoals = MeToMeGoals
+			// .getActiveGoalsByCustomerAndGoalType(
+			// sourceCustInfo.getCustomerId(), goalType);
+			//
+			// if (activeGoals.size() < 1) {
+			// this.destMessage = String
+			// .format("You do not have an Active %s Goal. Please go to the main menu to create your goal.",
+			// goalType.toUpperCase());
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+			// return;
+			// }
 
 			// Pick the First Goal Type: There will always be 1 goal per
 			// category for now
-			targetGoal = activeGoals.get(0);
+			// targetGoal = activeGoals.get(0);
 
 			// Check again
-			if (null == targetGoal) {
-				this.destMessage = String
-						.format("You do not have an Active %s Goal. You must first create a goal.",
-								goalType.toUpperCase());
+			// if (null == targetGoal) {
+			// this.destMessage = String
+			// .format("You do not have an Active %s Goal. Please go to the main menu to create your goal.",
+			// goalType.toUpperCase());
+			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+			// return;
+			// }
+
+			MeToMeGoals allActiveGoals = MeToMeGoals
+					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
+
+			if ((allActiveGoals.isEmpty()) && (allActiveGoals.size() < 1)) {
+				this.destMessage = "You do not have any active goal. Please go to the main menu to create your goal.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
+
+			targetGoal = allActiveGoals.get(0);
 
 			if ((transElements[2] == "0")
 					|| (Integer.parseInt(transElements[2]) == 0)) {
