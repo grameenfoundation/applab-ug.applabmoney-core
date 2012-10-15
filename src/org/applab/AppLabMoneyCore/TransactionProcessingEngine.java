@@ -70,25 +70,6 @@ public class TransactionProcessingEngine {
 	 */
 	public void processRequestCommand() {
 		try {
-			// Downgraded to JAVA1.6
-			/*
-			 * switch (requestKeyword.toUpperCase()) { case "KYCR":
-			 * processKYCR(); break; case "DPST": processDPST(); break; case
-			 * "MBAL": processMBAL(); break; case "CASH": processCASH(); break;
-			 * case "WDRW": processWDRW(); break; case "STMT": processSTMT();
-			 * break; case "PINC": processPINC(); break; case "ACTV":
-			 * processACTV(); break; case "CRGL": processCRGL(); break; case
-			 * "MTOM": processMTOM(); break; case "MTOU": // Use processMTOM()
-			 * for both MTOM and MTOU processMTOM(); break; case "GBAL":
-			 * processGBAL(); break; case "TENQ": processTENQ(); break; case
-			 * "REDM": processREDM(); break; case "STOP": processSTOP(); break;
-			 * case "REBT": processREBT(); break; default: destMessage =
-			 * "The Service failed to determine the kind of transaction requested."
-			 * ; HelperUtils.writeToLogFile("console", destMessag e);
-			 * HelperUtils.writeToLogFile("OutBoundMessages", destMessage); //
-			 * send the SMS HelperUtils.sendSMS(sourceMsisdn, destMessage,
-			 * referenceId); break; }
-			 */
 
 			if (requestKeyword.toUpperCase().equalsIgnoreCase("KYCR")) {
 				processKYCR();
@@ -246,6 +227,7 @@ public class TransactionProcessingEngine {
 
 			if (theMobileNo.startsWith(SystemConfigInfo.getCountryCode())) {
 				if (SystemConfigInfo.getMsisdnLeadZeroRequired()) {
+
 					// The MobileLength + 1 to cater for the Leading Zero
 					if (theMobileNo.trim().length() == (SystemConfigInfo
 							.getMobileLength()
@@ -853,7 +835,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[1];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[1] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -952,7 +934,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[3];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[3] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -1121,7 +1103,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[3];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[3] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -1288,7 +1270,7 @@ public class TransactionProcessingEngine {
 			newPassword = transElements[2];
 			maskedNewPassword = HelperUtils.maskPassword(newPassword);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[2] = maskedNewPassword;
 			transElements[1] = maskedOldPassword;
 
@@ -1415,7 +1397,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[11];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[11] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -1583,7 +1565,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[3];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[3] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -1944,13 +1926,14 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[transElements.length - 1];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[transElements.length - 1] = maskedPinCode;
 
 			// Reconstruct the Original string
 			String originalRequest = "";
 
 			for (int i = 0; i < transElements.length; i++) {
+
 				// Take care of OWN: Fix in the word OWN
 				if (isOwnPayment && i == 1) {
 					originalRequest += "OWN" + separatorChar;
@@ -2044,9 +2027,6 @@ public class TransactionProcessingEngine {
 
 			// Validate the GoalType or Name: Use Index from behind
 			goalType = transElements[transElements.length - 3].trim();
-			// MeToMeGoals activeGoals = MeToMeGoals
-			// .getActiveGoalsByCustomerAndGoalType(
-			// destCustInfo.getCustomerId(), goalType);
 
 			// Pick all active goals regardless of type
 			MeToMeGoals allActiveGoals = MeToMeGoals
@@ -2104,72 +2084,8 @@ public class TransactionProcessingEngine {
 				return;
 			}
 
-			// if (activeGoals.size() < 1) {
-			// if (isOwnPayment) {
-			// if ((!(allActiveGoals.isEmpty()))
-			// && (!(allActiveGoals.size() < 1))) {
-			// this.destMessage = String
-			// .format("The goal selected does not exist. You only have the %s goal active.",
-			// allActiveGoals.get(0).getGoalName()
-			// .toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage,
-			// referenceId);
-			// } else {
-			// this.destMessage =
-			// "The goal selected does not exist. Please go to the main menu to create your goal.";
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage,
-			// referenceId);
-			// }
-			// } else {
-			// this.destMessage = String
-			// .format("The Beneficiary %s does not have an Active %s Goal. Please ask the beneficiary to first create a goal.",
-			// CustomerInformation.getDisplayNames(
-			// destCustInfo, false).toUpperCase(),
-			// goalType.toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			//
-			// // Notify the Beneficiary Customer
-			// if (allActiveGoals.size() < 1) {
-			// this.destMessage = String
-			// .format("The Sponsor %s attempted to Pay %,.0f%s into your %s Goal, but you do not have any active goals. Please first create the goal then notify the sponsor.",
-			// CustomerInformation.getDisplayNames(
-			// sourceCustInfo, false)
-			// .toUpperCase(), amount,
-			// SystemConfigInfo.getCurrencyCode(),
-			// goalType.toUpperCase());
-			// HelperUtils.sendSMS(destMsisdn, destMessage,
-			// referenceId);
-			// } else {
-			// // Get the Active Goals
-			// String activeGoalsList = "";
-			// for (int goalsIndex = 0; goalsIndex < allActiveGoals
-			// .size(); goalsIndex++) {
-			// activeGoalsList = activeGoalsList
-			// .concat(allActiveGoals.get(goalsIndex)
-			// .getGoalName());
-			//
-			// if (goalsIndex < allActiveGoals.size() - 1) {
-			// activeGoalsList = activeGoalsList.concat(";");
-			// }
-			// }
-			// this.destMessage = String
-			// .format("The Sponsor %s attempted to Pay %,.0f%s into your %s Goal, but your Active goals are: %s. Please notify the sponsor.",
-			// CustomerInformation.getDisplayNames(
-			// sourceCustInfo, false)
-			// .toUpperCase(), amount,
-			// SystemConfigInfo.getCurrencyCode(),
-			// goalType.toUpperCase(), activeGoalsList
-			// .toUpperCase());
-			// HelperUtils.sendSMS(destMsisdn, destMessage,
-			// referenceId);
-			// }
-			// }
-			// return;
-			// }
-
 			// Otherwise, Pick the First Goal Type: There will always be 1 goal
 			// per category for now
-			// targetGoal = activeGoals.get(0);
 			targetGoal = allActiveGoals.get(0);
 
 			if (this.sourceCustInfo.getAccountInfo() == null
@@ -2320,20 +2236,6 @@ public class TransactionProcessingEngine {
 
 			// Validate the GoalType or Name
 			goalType = transElements[1].trim();
-			// MeToMeGoals activeGoals = MeToMeGoals
-			// .getActiveGoalsByCustomerAndGoalType(
-			// sourceCustInfo.getCustomerId(), goalType);
-			// if (activeGoals.size() < 1) {
-			// this.destMessage = String
-			// .format("You do not have an Active Goal for: %s. Please go to the main menu to create your goal.",
-			// goalType.toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
-			// }
-
-			// Pick the First Goal Type: There will always be 1 goal per
-			// category for now
-			// targetGoal = activeGoals.get(0);
 
 			// Pick all active goals regardless of type
 			MeToMeGoals allActiveGoals = MeToMeGoals
@@ -2345,6 +2247,8 @@ public class TransactionProcessingEngine {
 				return;
 			}
 
+			// Pick the First Goal Type: There will always be 1 goal per
+			// category for now
 			targetGoal = allActiveGoals.get(0);
 
 			// Check again
@@ -2367,14 +2271,6 @@ public class TransactionProcessingEngine {
 					- accruedGoalBalance;
 			double bookBalance = sourceCustInfo.getAccountInfo()
 					.getBookBalance() + accruedGoalBalance;
-
-			// this.destMessage = String
-			// .format("The Accrued Balance for your %s Goal is: %,.0f%s. This is %.0f percent of your target amount of: %,.0f%s that will mature on %s.",
-			// targetGoal.getGoalName(), accruedGoalBalance, currency,
-			// ((accruedGoalBalance / targetGoal.getTargetAmount()) * 100),
-			// targetGoal.getTargetAmount(), currency,
-			// new
-			// SimpleDateFormat("dd-MMM-yyyy").format(targetGoal.getMaturityDate()).toUpperCase());
 
 			this.destMessage = String
 					.format("%s Goal \r\nBalance: %s%,.0f \r\nRemaining Amount To Goal: %s%,.0f \r\nCash Out Date: %s \r\nMain Account Balance: %s%,.0f",
@@ -2423,7 +2319,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[2];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[2] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -2478,18 +2374,7 @@ public class TransactionProcessingEngine {
 
 			// Validate the GoalType or Name
 			goalType = transElements[1].trim();
-			// MeToMeGoals activeGoals = MeToMeGoals
-			// .getActiveGoalsByCustomerAndGoalType(
-			// sourceCustInfo.getCustomerId(), goalType);
 
-			// Pick the First Goal Type: There will always be 1 goal per
-			// category for now
-			// if ((activeGoals.isEmpty())) {
-			// this.destMessage =
-			// String.format("You do not have an Active Goal for: %s. Please go to the main menu to create your goal.",
-			// goalType.toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
 			// Pick all active goals regardless of type
 			MeToMeGoals allActiveGoals = MeToMeGoals
 					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
@@ -2502,8 +2387,8 @@ public class TransactionProcessingEngine {
 				return;
 
 			} else {
-				// targetGoal = activeGoals.get(0);
 				targetGoal = allActiveGoals.get(0);
+
 				// Get the Transactions for the selected Goal
 				MeToMeGoalTransactions meToMeGoalTrans = targetGoal
 						.getGoalTransactions();
@@ -2568,7 +2453,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[2];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[2] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -2619,19 +2504,6 @@ public class TransactionProcessingEngine {
 			// Customer
 			goalType = transElements[1].trim();
 
-			// MeToMeGoals activeGoals = MeToMeGoals
-			// .getActiveGoalsByCustomerAndGoalType(
-			// sourceCustInfo.getCustomerId(), goalType);
-
-			// Pick the First Goal Type: There will always be 1 goal per
-			// category for now
-			// if ((activeGoals.isEmpty())) {
-			// this.destMessage = String
-			// .format("You do not have an Active Goal for: %s. Please go to the main menu to create your goal.",
-			// goalType.toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
-
 			MeToMeGoals allActiveGoals = MeToMeGoals
 					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
 
@@ -2640,11 +2512,8 @@ public class TransactionProcessingEngine {
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			} else {
-				// targetGoal = activeGoals.get(0);
 				targetGoal = allActiveGoals.get(0);
-				// MeToMeGoals unRedeemedGoals = MeToMeGoals
-				// .getUnRedeemedGoalsByCustomerAndGoalType(
-				// sourceCustInfo.getCustomerId(), goalType);
+
 				MeToMeGoals unRedeemedGoals = MeToMeGoals
 						.getUnRedeemedGoalsByCustomer(sourceCustInfo
 								.getCustomerId());
@@ -2670,26 +2539,6 @@ public class TransactionProcessingEngine {
 				Date currDate = java.util.Calendar.getInstance().getTime();
 				SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
 				String currency = SystemConfigInfo.getCurrencyCode();
-
-				// Validate Maturity
-				// if (!targetGoal.isMatured()) {
-				// if (targetGoal.getMaturityDate().after(currDate)) {
-				// this.destMessage = String
-				// .format("Your %s goal can only be cashed out on %s or earlier if you reach %s%,.0f. You can make an early withdrawal from the me2me menu.",
-				// goalType.toUpperCase(),
-				// df.format(targetGoal.getMaturityDate()),
-				// currency, targetGoal.getTargetAmount());
-				// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-				// } else {
-				// this.destMessage = String
-				// .format("Your %s goal of target amount: %,.0f%s will be ready for cash out within 24 hours.",
-				// goalType.toUpperCase(),
-				// targetGoal.getTargetAmount(), currency,
-				// df.format(targetGoal.getMaturityDate()));
-				// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-				// }
-				// return;
-				// }
 
 				if (targetGoal.getMaturityDate().after(currDate)) {
 					if (!(targetGoal.getAccruedAmount() >= targetGoal
@@ -2747,21 +2596,12 @@ public class TransactionProcessingEngine {
 						}
 
 						// Get the final expected Book Balance. A second trip to
-						// the
-						// database would be more accurate
+						// the database would be more accurate
 						double bookBalance = sourceCustInfo.getAccountInfo()
 								.getBookBalance() + accruedGoalBalance;
 						double achievedPercentage = (accruedGoalBalance / targetGoal
 								.getTargetAmount()) * 100;
 
-						// this.destMessage = String
-						// .format("REF: %s: A LumpSum amount of %,.0f%s from your matured %s Goal was credited back into your main account. Your available balance in the main account is %,.0f%s.",
-						// referenceId, accruedGoalBalance, currency,
-						// targetGoal.getGoalName().toUpperCase(),
-						// bookBalance, currency);
-						// HelperUtils.sendSMS(sourceMsisdn, destMessage,
-						// referenceId);
-						//
 						// All money accrued can be redeemed
 						this.destMessage = String
 								.format("Your %s goal of target amount: %,.0f%s will be ready for cash out within 24 hours.",
@@ -2771,18 +2611,6 @@ public class TransactionProcessingEngine {
 										df.format(targetGoal.getMaturityDate()));
 						HelperUtils.sendSMS(sourceMsisdn, destMessage,
 								referenceId);
-
-						// I will have a function for doing the analysis on the
-						// savings and
-						// give the proper message
-						// this.destMessage = String
-						// .format("Congratulations! You managed to incubate your %s Goal of %,.0f%s until maturity and achieved %.0f percent of your target. You have earned a reward of %,d credit points.",
-						// targetGoal.getGoalName().toUpperCase(),
-						// targetGoal.getTargetAmount(), currency,
-						// achievedPercentage, Math.round(creditPoints));
-						// HelperUtils.sendSMS(sourceMsisdn, destMessage,
-						// referenceId);
-						//
 					}
 					return;
 				}
@@ -2947,7 +2775,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[3];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[3] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -2996,17 +2824,6 @@ public class TransactionProcessingEngine {
 
 			// Validate the GoalType or Name: get Active Goals for the Customer
 			goalType = transElements[1].trim();
-
-			// MeToMeGoals activeGoals = MeToMeGoals
-			// .getActiveGoalsByCustomerAndGoalType(
-			// sourceCustInfo.getCustomerId(), goalType);
-			// if (activeGoals.size() < 1) {
-			// this.destMessage = String
-			// .format("You do not have an Active %s Goal. Please go to the main menu to create your goal.",
-			// goalType.toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
-			// }
 
 			// Pick the First Goal Type: There will always be 1 goal per
 			// category for now
@@ -3068,14 +2885,6 @@ public class TransactionProcessingEngine {
 							targetGoal.getGoalName().toUpperCase(),
 							bookBalance, currency);
 			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-
-			// I will have a function for doing the analysis on the savings and
-			// give the proper message
-			// this.destMessage = String
-			// .format("Unfortunately, you did not Incubate your %s Goal of %s%,.0f until maturity. You stopped at %.0f percent of your target. Please give us feedback of your experience to help us better the Me2Me Product Features.",
-			// targetGoal.getGoalName().toUpperCase(), currency,
-			// targetGoal.getTargetAmount(), achievedPercentage);
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 		} catch (Exception ex) {
 			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
 					+ " TRACE: " + ex.getStackTrace());
@@ -3097,8 +2906,6 @@ public class TransactionProcessingEngine {
 		MeToMeGoal targetGoal = null;
 		Date newDate = new Date();
 
-		// lastName = transElements[2].trim().replace(asteriskChar, spaceChar);
-
 		try {
 
 			String formedSrcMsisdn = convertMobileNoToMsisdn(this.sourceMsisdn);
@@ -3119,7 +2926,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[4];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[4] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -3169,17 +2976,6 @@ public class TransactionProcessingEngine {
 			// Validate the GoalType or Name: get Active Goals for the Customer
 			goalType = transElements[1].trim();
 
-			// MeToMeGoals activeGoals = MeToMeGoals
-			// .getActiveGoalsByCustomerAndGoalType(
-			// sourceCustInfo.getCustomerId(), goalType);
-			// if (activeGoals.size() < 1) {
-			// this.destMessage = String
-			// .format("You do not have an Active %s Goal. Please go to the main menu to create your goal.",
-			// goalType.toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
-			// }
-
 			MeToMeGoals allActiveGoals = MeToMeGoals
 					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
 
@@ -3188,38 +2984,10 @@ public class TransactionProcessingEngine {
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
+
 			// Pick the First Goal Type: There will always be 1 goal per
 			// category for now
-			// targetGoal = activeGoals.get(0);
-
 			targetGoal = allActiveGoals.get(0);
-
-			// Check again
-			// if (null == targetGoal) {
-			// this.destMessage = String
-			// .format("You do not have an Active %s Goal. Please go to the main menu to create your goal.",
-			// targetGoal.getGoalName().toUpperCase());
-			// goalType.toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
-			// }
-
-			// Check whether goal allows for liquidity
-			// if (targetGoal.getLiquidityOption().equalsIgnoreCase(
-			// HelperUtils.LIQUIDITY_OPTION_NAME_NONE)) {
-			// this.destMessage = String
-			// .format("Your %s Goal does not allow for Liquidity. Please be patient and wait for the goal to mature on %s.",
-			// targetGoal.getGoalName().toUpperCase(),
-			// new SimpleDateFormat("dd-MMM-yyyy").format(
-			// targetGoal.getMaturityDate())
-			// .toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
-			// }
-
-			// Get the Reason why the Customer is withdrawing
-			// withdrawReason = transElements[2].trim().replace(asteriskChar,
-			// spaceChar);
 
 			// Process the Amount
 			amountStr = transElements[3].trim();
@@ -3242,42 +3010,8 @@ public class TransactionProcessingEngine {
 			double percentageSaved = (accruedGoalBalance / targetGoal
 					.getTargetAmount()) * 100;
 
-			// if (percentageSaved < HelperUtils.REBATE_MIN_SAVED_PERCENT) {
-			// this.destMessage = String
-			// .format("You are required to have achieved at least %.0f percent of the target amount of %,.0f%s of your %s goal in order to qualify for early withdrawal.",
-			// HelperUtils.REBATE_MIN_SAVED_PERCENT,
-			// targetGoal.getTargetAmount(), currency,
-			// targetGoal.getGoalName().toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
-			// }
-			//
-			// double percentageOfBalance = (amount / accruedGoalBalance) * 100;
-			// double maxAllowedLiquidity =
-			// (HelperUtils.REBATE_MAX_ALLOWED_PERCENT_OF_BALANCE / 100)
-			// * accruedGoalBalance;
-			//
-			// if ((percentageOfBalance >
-			// HelperUtils.REBATE_MAX_ALLOWED_PERCENT_OF_BALANCE)
-			// && (!targetGoal.getLiquidityOption().equalsIgnoreCase(
-			// HelperUtils.LIQUIDITY_OPTION_NAME_FULL))) {
-			// this.destMessage = String
-			// .format("Your %s goal allows for %s Liquidity of upto %.0f percent of your accumulated balance. You currently qualify for a maximum liquidity of %,.0f%s.",
-			// targetGoal.getGoalName().toUpperCase(),
-			// targetGoal.getLiquidityOption().toUpperCase(),
-			// HelperUtils.REBATE_MAX_ALLOWED_PERCENT_OF_BALANCE,
-			// maxAllowedLiquidity, currency);
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
-			// }
-
-			// TODO: Validate Time factor also
-
 			// Verify Amounts: Still consider the total accrued Balance during
 			// Reconciliation
-			// if ((accruedGoalBalance < amount)
-			// || (sourceCustInfo.getAccountInfo().getBlockedBalance() <
-			// accruedGoalBalance)) {
 			if (sourceCustInfo.getAccountInfo().getBlockedBalance() < accruedGoalBalance) {
 				this.destMessage = "There was a problem reconciling your balance in the savings wallet with the liquidity amount. Please contact Customer Care for assistance.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
@@ -3292,6 +3026,7 @@ public class TransactionProcessingEngine {
 			} else if (accruedGoalBalance >= amount) {
 
 				if (accruedGoalBalance > amount) {
+
 					// Process Rebate
 					boolean retRebate = transferFundsRebate(sourceCustInfo
 							.getAccountInfo().getAccountId(),
@@ -3359,6 +3094,7 @@ public class TransactionProcessingEngine {
 	 * 
 	 */
 	private void processALTG() {
+
 		// ALTG SCHOOLFEES 1000000 31122012 8876
 		String[] transElements = null;
 		String goalType = "";
@@ -3392,7 +3128,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[4];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[4] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -3447,31 +3183,6 @@ public class TransactionProcessingEngine {
 			goalType = transElements[1];
 
 			// Check if goal exists
-			// MeToMeGoals activeGoals = MeToMeGoals
-			// .getActiveGoalsByCustomerAndGoalType(
-			// sourceCustInfo.getCustomerId(), goalType);
-			//
-			// if (activeGoals.size() < 1) {
-			// this.destMessage = String
-			// .format("You do not have an Active %s Goal. Please go to the main menu to create your goal.",
-			// goalType.toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
-			// }
-
-			// Pick the First Goal Type: There will always be 1 goal per
-			// category for now
-			// targetGoal = activeGoals.get(0);
-
-			// Check again
-			// if (null == targetGoal) {
-			// this.destMessage = String
-			// .format("You do not have an Active %s Goal. Please go to the main menu to create your goal.",
-			// goalType.toUpperCase());
-			// HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-			// return;
-			// }
-
 			MeToMeGoals allActiveGoals = MeToMeGoals
 					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
 
@@ -3510,8 +3221,7 @@ public class TransactionProcessingEngine {
 
 				// Validate Maturity Date: Enforce 1 Months savings
 				// Check that the new date is not less than a month from the
-				// date
-				// the goal was created
+				// date the goal was created
 				Calendar cal1 = Calendar.getInstance();
 				oldCreatedDate = targetGoal.getCreatedTimestamp();
 				cal1.setTime(oldCreatedDate);
@@ -3560,8 +3270,8 @@ public class TransactionProcessingEngine {
 	 * Method to Invite Friends to my Network ZIMBA: NTINVITE
 	 */
 	private void processINVT() {
-		// INVT SCHOOLFEES 0779661906,0781058390 4321
 
+		// INVT SCHOOLFEES 0779661906,0781058390 4321
 		String[] transElements = null;
 		String pinCode = "";
 		String maskedPinCode = "";
@@ -3589,7 +3299,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[transElements.length - 1];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[transElements.length - 1] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -3659,7 +3369,7 @@ public class TransactionProcessingEngine {
 			String friendMsisdn = "";
 			CustomerInformation friendCustInfo = null;
 
-			// send Invitation SMS for Each Phone Number
+			// Send Invitation SMS for Each Phone Number
 			for (int i = 0; i < phoneNumbers.length; i++) {
 
 				// Confirm that the number is valid
@@ -3715,8 +3425,8 @@ public class TransactionProcessingEngine {
 	 * Method to Activate ZIMBA: NTACTV
 	 */
 	private void processNTACTV() {
-		// NTACTV SMALL*(5*TO*10*FRIENDS) BOTH 4321
 
+		// NTACTV SMALL*(5*TO*10*FRIENDS) BOTH 4321
 		String[] transElements = null;
 		String pinCode = "";
 		String maskedPinCode = "";
@@ -3744,7 +3454,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[transElements.length - 1];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[transElements.length - 1] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -3847,8 +3557,8 @@ public class TransactionProcessingEngine {
 	 * Method to Invite Friends to my Network ZIMBA: NTINVITE
 	 */
 	private void processNTINVITE() {
-		// NTINVITE 0779661906,0781058390 4321
 
+		// NTINVITE 0779661906,0781058390 4321
 		String[] transElements = null;
 		String pinCode = "";
 		String maskedPinCode = "";
@@ -3876,7 +3586,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[transElements.length - 1];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[transElements.length - 1] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -3946,7 +3656,7 @@ public class TransactionProcessingEngine {
 			String friendMsisdn = "";
 			CustomerInformation friendCustInfo = null;
 
-			// send Invitation SMS for Each Phone Number
+			// Send Invitation SMS for Each Phone Number
 			for (int i = 0; i < phoneNumbers.length; i++) {
 
 				// Confirm that the number is valid
@@ -4045,6 +3755,7 @@ public class TransactionProcessingEngine {
 				}
 
 				if (!isReminderInvitation) {
+
 					// Log the Invitation in the Database
 					ZimbaInvitation zimbaInvitation = new ZimbaInvitation();
 					zimbaInvitation.setCustomerId(sourceCustInfo
@@ -4054,6 +3765,7 @@ public class TransactionProcessingEngine {
 					boolean retVal = ZimbaInvitations
 							.createZimbaInvitation(zimbaInvitation);
 					if (retVal) {
+
 						// Do Notify: But I have already told Customer that
 						// invite was sent???? -:)
 					}
@@ -4069,6 +3781,7 @@ public class TransactionProcessingEngine {
 	 * Method to Respond to a ZIMBA Network Invitation: NTRESPINV
 	 */
 	private void processNTRESPINV() {
+
 		// NTRESPINV 0779661904 ACCEPT*INVITATION FAMILY-MEMBER 4321
 
 		String[] transElements = null;
@@ -4099,7 +3812,7 @@ public class TransactionProcessingEngine {
 			pinCode = transElements[transElements.length - 1];
 			maskedPinCode = HelperUtils.maskPassword(pinCode);
 
-			// swap the originalPassword with the maskedPassword
+			// Swap the originalPassword with the maskedPassword
 			transElements[transElements.length - 1] = maskedPinCode;
 
 			// Reconstruct the Original string
@@ -4259,6 +3972,7 @@ public class TransactionProcessingEngine {
 				HelperUtils.sendSMS(invitorMsisdn, destMessage, referenceId);
 
 			} else {
+
 				// Message to the Invited
 				this.destMessage = String
 						.format("Your Decline response to the Zimba Invitation by %s has been processed successfully. You can still connect later by sending the person an Invitation.",
@@ -4266,7 +3980,7 @@ public class TransactionProcessingEngine {
 										invitorCustInfo, false));
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 
-				// Message to the Invitor
+				// Message to the Inviter
 				this.destMessage = String
 						.format("Sorry, %s has Declined your Zimba Invitation. You can still connect later.",
 								CustomerInformation.getDisplayNames(
