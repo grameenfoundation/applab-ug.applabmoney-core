@@ -17,7 +17,7 @@ public class MeToMeGoalTransactions extends ArrayList<MeToMeGoalTransaction> {
 		StringBuilder sb = null;
 		String transRecord = "";
 		String transSms = "";
-		SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+		SimpleDateFormat df = new SimpleDateFormat("dd MM yyyy");
 		String currencyCode = "";
 
 		try {

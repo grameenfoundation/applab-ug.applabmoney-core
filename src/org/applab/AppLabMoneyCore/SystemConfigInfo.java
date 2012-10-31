@@ -239,7 +239,7 @@ public class SystemConfigInfo {
         setKeyCostCollectImmediate(false);
         setMaintenanceModeFlag(false);
         setMaintenanceModeMsgId(60001);
-        setMaxPasswordLen(4);
+        setMaxPasswordLen(5);
         setMinPasswordLen(4);
         setMobileLength(9);
         setMsisdnLeadZeroRequired(false);

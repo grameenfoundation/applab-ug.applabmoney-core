@@ -20,6 +20,7 @@ import org.applab.AppLabMoneyCore.Zimba.ZimbaInvitation;
 import org.applab.AppLabMoneyCore.Zimba.ZimbaInvitations;
 import org.applab.AppLabMoneyCore.Zimba.ZimbaNetwork;
 import org.applab.AppLabMoneyCore.Zimba.ZimbaNetworks;
+import org.applab.AppLabMoneyCore.HelperUtils;
 
 public class TransactionProcessingEngine {
 
@@ -105,6 +106,10 @@ public class TransactionProcessingEngine {
 				processREBT();
 			} else if (requestKeyword.toUpperCase().equalsIgnoreCase("ALTG")) {
 				processALTG();
+			} else if (requestKeyword.toUpperCase().equalsIgnoreCase("ALTGA")) {
+				processALTGA();
+			} else if (requestKeyword.toUpperCase().equalsIgnoreCase("ALTGD")) {
+				processALTGD();
 			} else if (requestKeyword.toUpperCase().equalsIgnoreCase("INVT")) {
 				processINVT();
 			}
@@ -782,6 +787,100 @@ public class TransactionProcessingEngine {
 
 			stm = cn.prepareStatement(String.format(sqlQuery, targetAmount,
 					maturityDateStr, goalId));
+
+			// Execute the Query
+			dbStatusCode = stm.executeUpdate();
+
+			if (dbStatusCode <= 0) {
+				cn.rollback();
+				return false;
+			}
+
+			cn.commit();
+
+			return true;
+		} catch (Exception ex) {
+			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
+					+ " TRACE: " + ex.getStackTrace());
+			return false;
+		} finally {
+			if (cn != null) {
+				cn.close();
+			}
+
+			if (stm != null) {
+				stm.close();
+			}
+		}
+	}
+
+	private boolean alterMeToMeGoalAmount(long sourceAccountId, int goalId,
+			double targetAmount, String referenceId, String sourceMsisdn)
+			throws SQLException {
+		Connection cn = null;
+		PreparedStatement stm = null;
+		StringBuilder sb = null;
+		int dbStatusCode = 0;
+		String sqlQuery = "";
+
+		try {
+			cn = DatabaseHelper.getConnection(HelperUtils.TARGET_DATABASE);
+			cn.setAutoCommit(false);
+
+			// Credit the Me2Me Goal
+			sb = new StringBuilder();
+			sb.append("UPDATE ME2ME_GOALS SET TARGET_AMOUNT = %f WHERE GOAL_ID = %d");
+			sqlQuery = sb.toString();
+
+			stm = cn.prepareStatement(String.format(sqlQuery, targetAmount,
+					goalId));
+
+			// Execute the Query
+			dbStatusCode = stm.executeUpdate();
+
+			if (dbStatusCode <= 0) {
+				cn.rollback();
+				return false;
+			}
+
+			cn.commit();
+
+			return true;
+		} catch (Exception ex) {
+			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
+					+ " TRACE: " + ex.getStackTrace());
+			return false;
+		} finally {
+			if (cn != null) {
+				cn.close();
+			}
+
+			if (stm != null) {
+				stm.close();
+			}
+		}
+	}
+
+	private boolean alterMeToMeGoalDate(long sourceAccountId, int goalId,
+			String maturityDateStr, String referenceId, String sourceMsisdn)
+			throws SQLException {
+		Connection cn = null;
+		PreparedStatement stm = null;
+		StringBuilder sb = null;
+		int dbStatusCode = 0;
+		String sqlQuery = "";
+
+		try {
+			cn = DatabaseHelper.getConnection(HelperUtils.TARGET_DATABASE);
+			cn.setAutoCommit(false);
+
+			// Credit the Me2Me Goal
+			sb = new StringBuilder();
+			sb.append("UPDATE ME2ME_GOALS SET MATURITY_DATE = '%s' WHERE GOAL_ID = %d");
+			sqlQuery = sb.toString();
+
+			stm = cn.prepareStatement(String.format(sqlQuery, maturityDateStr,
+					goalId));
 
 			// Execute the Query
 			dbStatusCode = stm.executeUpdate();
@@ -1802,21 +1901,22 @@ public class TransactionProcessingEngine {
 			}
 
 			SimpleDateFormat inputDateFormatter = new SimpleDateFormat(
-					"ddMMMyyyy", Locale.ENGLISH);
+					"ddMMyyyy", Locale.ENGLISH);
 			SimpleDateFormat outputDateFormatter = new SimpleDateFormat(
-					"dd-MMM-yyyy");
+					"dd MM yyyy");
 
 			goalType = transElements[1];
 			targetAmountStr = transElements[2];
 			targetAmount = Double.parseDouble(targetAmountStr);
-			maturityDateStr = transElements[3].trim().replaceAll("\\W", "");
+			String[] dateParts = transElements[3].trim().split(":");
+			maturityDateStr = dateParts[1].replaceAll("\\W", "");
 			maturityDate = inputDateFormatter.parse(maturityDateStr);
 			alertOption = transElements[4];
 			liquidityOption = transElements[5];
 
 			// Validate the Amount: Enforce 50000 thresh-hold amount
 			if ((targetAmount < 500) || (targetAmount > 10000000)) {
-				this.destMessage = "Your goal creation was unsuccessful. Your target amount must be above 500UGX. Please create a new goal.";
+				this.destMessage = "Your goal creation was unsuccessful. Your target amount must be above UGX500. Please create a new goal.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1826,7 +1926,7 @@ public class TransactionProcessingEngine {
 			cal.add(Calendar.MONTH, 1);
 
 			if (maturityDate.before(cal.getTime())) {
-				this.destMessage = "The Cash Out Date or Period is Invalid. It has to be at least 1 month in the future. Please create a new goal.";
+				this.destMessage = "The Goal End Date is Invalid. It has to be at least 1 month in the future. Please create a new goal.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1874,7 +1974,7 @@ public class TransactionProcessingEngine {
 			}
 
 			this.destMessage = String
-					.format("You successfully created your me2me goal: %s\r\nTarget Amount: %s%,.0f\r\nCash Out Date: %s",
+					.format("You successfully created your me2me goal: %s\r\nTarget Amount: %s%,.0f\r\nGoal End Date: %s",
 							goalType.toUpperCase(), SystemConfigInfo
 									.getCurrencyCode(), targetAmount,
 							outputDateFormatter.format(maturityDate)
@@ -2125,7 +2225,7 @@ public class TransactionProcessingEngine {
 
 			if (isOwnPayment) {
 				this.destMessage = String
-						.format("REF: %s: You have sent %s%,.0f to your goal, %s.\r\nGoal Balance: %s%,.0f\r\nRemaining Amount To Goal: %s%,.0f\r\nMain Account Balance: %s%,.0f",
+						.format("REF: %s: You have sent %s%,.0f to your goal, %s.\r\nAmount Raised: %s%,.0f\r\nAmount To Goal End: %s%,.0f\r\nMain Account Balance: %s%,.0f",
 								referenceId, currency, amount,
 								targetGoal.getGoalName(), currency,
 								accruedGoalBalance, currency, remainingTarget,
@@ -2260,7 +2360,7 @@ public class TransactionProcessingEngine {
 
 			if ((targetGoal.isStopped()) || (targetGoal.isMatured())) {
 				this.destMessage = String
-						.format("This goal was closed and therefore does not exist. You can create another goal.",
+						.format("This goal was closed and therefore does not exist. Please go to the main menu to create another goal.",
 								goalType.toUpperCase());
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
@@ -2273,13 +2373,13 @@ public class TransactionProcessingEngine {
 					.getBookBalance() + accruedGoalBalance;
 
 			this.destMessage = String
-					.format("%s Goal \r\nBalance: %s%,.0f \r\nRemaining Amount To Goal: %s%,.0f \r\nCash Out Date: %s \r\nMain Account Balance: %s%,.0f",
+					.format("%s Goal \r\n\r\nAmount Raised: %s%,.0f \r\nAmount To Goal End: %s%,.0f \r\nGoal End Date: %s \r\nMain Account Balance: %s%,.0f",
 							targetGoal.getGoalName(),
 							currency,
 							accruedGoalBalance,
 							currency,
 							remainingTarget,
-							new SimpleDateFormat("dd-MMM-yyyy").format(
+							new SimpleDateFormat("dd MM yyyy").format(
 									targetGoal.getMaturityDate()).toUpperCase(),
 							currency, sourceCustInfo.getAccountInfo()
 									.getBookBalance());
@@ -2395,9 +2495,7 @@ public class TransactionProcessingEngine {
 
 				if ((targetGoal == null) || (allActiveGoals.size() < 1)
 						&& (unRedeemedGoals.size() < 1)) {
-					this.destMessage = String
-							.format("You do not have an Active Goal for: %s. Please go to the main menu to create your goal.",
-									goalType.toUpperCase());
+					this.destMessage = "You do not have any active goals. Please go to the main menu to create your goal.";
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				} else if (meToMeGoalTrans == null) {
@@ -2537,71 +2635,80 @@ public class TransactionProcessingEngine {
 				}
 
 				Date currDate = java.util.Calendar.getInstance().getTime();
-				SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+				SimpleDateFormat df = new SimpleDateFormat("dd MM yyyy");
 				String currency = SystemConfigInfo.getCurrencyCode();
 
+				// //If Goal End Date is not reached
+				// if (targetGoal.getMaturityDate().after(currDate)) {
+				// if (!(targetGoal.getAccruedAmount() >= targetGoal
+				// .getTargetAmount())) {
+				// this.destMessage = String
+				// .format("Your %s goal can only be cashed out on %s or earlier if you reach %s%,.0f. You can make an early withdrawal from the me2me menu.",
+				// targetGoal.getGoalName().toUpperCase(),
+				// df.format(targetGoal.getMaturityDate()),
+				// currency, targetGoal.getTargetAmount());
+				// HelperUtils.sendSMS(sourceMsisdn, destMessage,
+				// referenceId);
+				// } else {
+
+				double accruedGoalBalance = targetGoal.getAccruedAmount();
+
+				// Compute Rewards
+				// double cashReward = 0.00;
+				// Assume a Credit Point = 10000.00UGX
+				double creditPoints = accruedGoalBalance / 10000.00;
+
+				// Verify Amounts
+				if (sourceCustInfo.getAccountInfo().getBlockedBalance() < accruedGoalBalance) {
+					this.destMessage = "There was a problem reconciling your balance in the savings wallet with the goal amount to be redeemed. Please contact Customer Care for assistance.";
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+
+				// Verify again that Goal is not Redeemed
+				if (targetGoal.isRedeemed()) {
+					this.destMessage = String
+							.format("The %s Goal you are trying to redeem is already redeemed. The redemption was on %s. Please contact Customer Care for assistance.",
+									targetGoal.getGoalName().toUpperCase(),
+									df.format(targetGoal.getDateRedeemed())
+											.toUpperCase());
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+
+				// Process Redemption
+				boolean retRedeemGoal = transferFundsRedeemMeToMeGoal(
+						sourceCustInfo.getAccountInfo().getAccountId(),
+						targetGoal.getGoalId(), accruedGoalBalance);
+
+				if (!retRedeemGoal) {
+					this.destMessage = "Sorry, the me2me transaction was not completed due to processing problems.";
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+
+				// Get the final expected Book Balance. A second trip to
+				// the database would be more accurate
+				double bookBalance = sourceCustInfo.getAccountInfo()
+						.getBookBalance() + accruedGoalBalance;
+				double achievedPercentage = (accruedGoalBalance / targetGoal
+						.getTargetAmount()) * 100;
+
+				// If Goal End Date is not reached
 				if (targetGoal.getMaturityDate().after(currDate)) {
 					if (!(targetGoal.getAccruedAmount() >= targetGoal
 							.getTargetAmount())) {
+
+						// All money accrued can be redeemed
 						this.destMessage = String
-								.format("Your %s goal can only be cashed out on %s or earlier if you reach %s%,.0f. You can make an early withdrawal from the me2me menu.",
-										targetGoal.getGoalName().toUpperCase(),
-										df.format(targetGoal.getMaturityDate()),
-										currency, targetGoal.getTargetAmount());
+								.format("You have chosen to stop your %s goal of target amount %,.0f%s prior to the goal end date. The Amount Raised will be ready for cash out within 24 hours.",
+										goalType.toUpperCase(),
+										targetGoal.getAccruedAmount(),
+										currency,
+										df.format(targetGoal.getMaturityDate()));
 						HelperUtils.sendSMS(sourceMsisdn, destMessage,
 								referenceId);
 					} else {
-
-						double accruedGoalBalance = targetGoal
-								.getAccruedAmount();
-
-						// Compute Rewards
-						// double cashReward = 0.00;
-						// Assume a Credit Point = 10000.00UGX
-						double creditPoints = accruedGoalBalance / 10000.00;
-
-						// Verify Amounts
-						if (sourceCustInfo.getAccountInfo().getBlockedBalance() < accruedGoalBalance) {
-							this.destMessage = "There was a problem reconciling your balance in the savings wallet with the goal amount to be redeemed. Please contact Customer Care for assistance.";
-							HelperUtils.sendSMS(sourceMsisdn, destMessage,
-									referenceId);
-							return;
-						}
-
-						// Verify again that Goal is not Redeemed
-						if (targetGoal.isRedeemed()) {
-							this.destMessage = String
-									.format("The %s Goal you are trying to redeem is already redeemed. The redemption was on %s. Please contact Customer Care for assistance.",
-											targetGoal.getGoalName()
-													.toUpperCase(),
-											df.format(
-													targetGoal
-															.getDateRedeemed())
-													.toUpperCase());
-							HelperUtils.sendSMS(sourceMsisdn, destMessage,
-									referenceId);
-							return;
-						}
-
-						// Process Redemption
-						boolean retRedeemGoal = transferFundsRedeemMeToMeGoal(
-								sourceCustInfo.getAccountInfo().getAccountId(),
-								targetGoal.getGoalId(), accruedGoalBalance);
-
-						if (!retRedeemGoal) {
-							this.destMessage = "Sorry, the Me2Me transaction was not completed due to processing problems.";
-							HelperUtils.sendSMS(sourceMsisdn, destMessage,
-									referenceId);
-							return;
-						}
-
-						// Get the final expected Book Balance. A second trip to
-						// the database would be more accurate
-						double bookBalance = sourceCustInfo.getAccountInfo()
-								.getBookBalance() + accruedGoalBalance;
-						double achievedPercentage = (accruedGoalBalance / targetGoal
-								.getTargetAmount()) * 100;
-
 						// All money accrued can be redeemed
 						this.destMessage = String
 								.format("Your %s goal of target amount: %,.0f%s will be ready for cash out within 24 hours.",
@@ -2612,6 +2719,7 @@ public class TransactionProcessingEngine {
 						HelperUtils.sendSMS(sourceMsisdn, destMessage,
 								referenceId);
 					}
+					// }
 					return;
 				}
 			}
@@ -2728,14 +2836,14 @@ public class TransactionProcessingEngine {
 					.activateMe2Me(sourceCustInfo);
 
 			if (!retActivateMe2Me) {
-				this.destMessage = "The System encountered a problem while activating your Me2Me wallet. Please contact Customer Service for more Information.";
+				this.destMessage = "The System encountered a problem while activating your me2me wallet. Please contact Customer Service for more Information.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
 			HelperUtils.writeToLogFile("console",
 					"Sending Notification for Successful ACTV");
-			this.destMessage = "You have successfully activated your Me2Me wallet. You can now create goals and make payments towards them.";
+			this.destMessage = "You have successfully activated your me2me wallet. You can now create goals and make payments towards them.";
 			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 		} catch (Exception ex) {
 			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
@@ -3018,7 +3126,7 @@ public class TransactionProcessingEngine {
 				return;
 			} else if (accruedGoalBalance < amount) {
 				this.destMessage = String
-						.format("REF: %s: You cannot withdraw %s%,.0f because your %s goal balance is %s%,.0f. Please withdraw a lower amount.",
+						.format("REF: %s: You cannot withdraw %s%,.0f because your %s Amount Raised is %s%,.0f. Please withdraw a lower amount.",
 								referenceId, currency, amount, targetGoal
 										.getGoalName().toUpperCase(), currency,
 								accruedGoalBalance);
@@ -3069,14 +3177,14 @@ public class TransactionProcessingEngine {
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				} else {
 					this.destMessage = String
-							.format("REF: %s: You have transferred %s%,.0f from %s goal into main account\r\nGoal Balance: %s%,.0f\r\nCash Out Date: %s\r\nMain Account Balance: %s%,.0f",
+							.format("REF: %s: You have transferred %s%,.0f from %s goal into main account\r\nAmount Raised: %s%,.0f\r\nGoal End Date: %s\r\nMain Account Balance: %s%,.0f",
 									referenceId,
 									currency,
 									amount,
 									targetGoal.getGoalName().toUpperCase(),
 									currency,
 									newAccruedGoalBalance,
-									new SimpleDateFormat("dd-MMM-yyyy").format(
+									new SimpleDateFormat("dd MM yyyy").format(
 											targetGoal.getMaturityDate())
 											.toUpperCase(), currency,
 									bookBalance);
@@ -3178,7 +3286,7 @@ public class TransactionProcessingEngine {
 			SimpleDateFormat inputDateFormatter = new SimpleDateFormat(
 					"ddMMyyyy");
 			SimpleDateFormat outputDateFormatter = new SimpleDateFormat(
-					"dd-MMM-yyyy");
+					"dd MM yyyy");
 
 			goalType = transElements[1];
 
@@ -3229,7 +3337,7 @@ public class TransactionProcessingEngine {
 
 				if (maturityDate.before(cal1.getTime())) {
 					this.destMessage = String
-							.format("The Cash Out Date or Period is Invalid. It has to be at least 1 month from the date of creation. Your %s goal is unchanged.",
+							.format("The Goal End Date is Invalid. It has to be at least 1 month from the date of creation. Your %s goal is unchanged.",
 									targetGoal.getGoalName());
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
@@ -3254,11 +3362,326 @@ public class TransactionProcessingEngine {
 			String currency = SystemConfigInfo.getCurrencyCode();
 
 			this.destMessage = String
-					.format("REF: %s: You have successfully changed your %s goal.\r\nTarget Amount: %s%,.0f\r\nCash Out Date: %s",
+					.format("REF: %s: You have successfully changed your %s goal.\r\nTarget Amount: %s%,.0f\r\nGoal End Date: %s",
 							referenceId, targetGoal.getGoalName(), currency,
 							targetAmount,
 							outputDateFormatter.format(maturityDate)
 									.toUpperCase());
+			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+		} catch (Exception ex) {
+			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
+					+ " TRACE: " + ex.getStackTrace());
+		}
+	}
+
+	/**
+	 * Method to Edit existing Goal target Amount
+	 * 
+	 */
+	private void processALTGA() {
+
+		// ALTG SCHOOLFEES 1000000 8876
+		String[] transElements = null;
+		String goalType = "";
+		String targetAmountStr = "";
+		double targetAmount = 0.00;
+		String maturityDateStr = "";
+		Date maturityDate = null;
+		String pinCode = "";
+		String maskedPinCode = "";
+		String separatorChar = " ";
+		MeToMeGoal targetGoal = null;
+		Date oldCreatedDate = null;
+
+		try {
+
+			String formedSrcMsisdn = convertMobileNoToMsisdn(this.sourceMsisdn);
+			if (formedSrcMsisdn.isEmpty()) {
+				this.destMessage = "You are not authorized to use this service.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			this.sourceMsisdn = formedSrcMsisdn;
+			transElements = requestCommand.split(separatorChar);
+			if (transElements.length < 4) {
+				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			pinCode = transElements[3];
+			maskedPinCode = HelperUtils.maskPassword(pinCode);
+
+			// Swap the originalPassword with the maskedPassword
+			transElements[3] = maskedPinCode;
+
+			// Reconstruct the Original string
+			String originalRequest = "";
+
+			for (int i = 0; i < transElements.length; i++) {
+				originalRequest += transElements[i] + separatorChar;
+			}
+
+			if (!logInBoundMessage(originalRequest)) {
+				return;
+			}
+
+			HelperUtils.writeToLogFile("InBoundMessages", String.format(
+					"%s~%s~%s", referenceId, sourceMsisdn, originalRequest));
+
+			this.sourceCustInfo = CustomerInformation
+					.getCustomerAccountInfo(sourceMsisdn);
+			if (sourceCustInfo == null) {
+				this.destMessage = "You are not authorized to use this service. Please contact Customer Service for more information.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			if (!validatePinCode(pinCode)) {
+				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			ValidationReturnInformation validSrcCustInfo = CustomerInformation
+					.validateCustomerAccountInfo(sourceCustInfo, true);
+			if (!validSrcCustInfo.isPassedValidation()) {
+				HelperUtils.sendSMS(sourceMsisdn,
+						validSrcCustInfo.getValidationMessage(), referenceId);
+				return;
+			}
+
+			if (pinCode.equalsIgnoreCase(HelperUtils.getDefaultPinCode(
+					SystemConfigInfo.getMinPasswordLen(),
+					SystemConfigInfo.getMaxPasswordLen()))) {
+				this.destMessage = "For your own security please change your PIN before doing any transactions.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			goalType = transElements[1];
+
+			// Check if goal exists
+			MeToMeGoals allActiveGoals = MeToMeGoals
+					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
+
+			if ((allActiveGoals.isEmpty()) && (allActiveGoals.size() < 1)) {
+				this.destMessage = "You do not have any active goal. Please go to the main menu to create your goal.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+			targetGoal = allActiveGoals.get(0);
+
+			if ((transElements[2] == "0")
+					|| (Integer.parseInt(transElements[2]) == 0)) {
+				targetAmount = targetGoal.getTargetAmount();
+			} else {
+				targetAmountStr = transElements[2];
+				targetAmount = Double.parseDouble(targetAmountStr);
+
+				// Validate the Amount: Enforce 500 thresh-hold amount and 10M
+				// ceiling
+				if ((targetAmount < 500) || (targetAmount > 10000000)
+						&& (targetAmount != targetGoal.getTargetAmount())) {
+					this.destMessage = String
+							.format("The Target Amount is invalid. Your target amount must be above UGX500 and not exceed UGX10,000,000. Your %s goal is unchanged.",
+									goalType.toUpperCase());
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+			}
+
+			// Make the Transfer
+			boolean retAlter = false;
+
+			retAlter = alterMeToMeGoalAmount(sourceCustInfo.getAccountInfo()
+					.getAccountId(), targetGoal.getGoalId(), targetAmount,
+					referenceId, sourceCustInfo.getMsisdn());
+
+			if (!retAlter) {
+				this.destMessage = "Sorry, the Me2Me transaction was not completed due to processing problems.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			String currency = SystemConfigInfo.getCurrencyCode();
+
+			this.destMessage = String
+					.format("REF: %s: You have successfully changed your %s goal.\r\nTarget Amount: %s%,.0f\r\nGoal End Date: %s",
+							referenceId, targetGoal.getGoalName(), currency,
+							targetAmount, targetGoal.getMaturityDate());
+			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+		} catch (Exception ex) {
+			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
+					+ " TRACE: " + ex.getStackTrace());
+		}
+	}
+
+	/**
+	 * Method to Edit existing Goal target Amount
+	 * 
+	 */
+	private void processALTGD() {
+
+		// ALTG SCHOOLFEES 1000000 20122012
+		String[] transElements = null;
+		String goalType = "";
+		String targetAmountStr = "";
+		double targetAmount = 0.00;
+		String maturityDateStr = "";
+		Date maturityDate = null;
+		String pinCode = "";
+		String maskedPinCode = "";
+		String separatorChar = " ";
+		MeToMeGoal targetGoal = null;
+		Date oldCreatedDate = null;
+		Date currentTargetDate = null;
+
+		try {
+
+			String formedSrcMsisdn = convertMobileNoToMsisdn(this.sourceMsisdn);
+			if (formedSrcMsisdn.isEmpty()) {
+				this.destMessage = "You are not authorized to use this service.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			this.sourceMsisdn = formedSrcMsisdn;
+			transElements = requestCommand.split(separatorChar);
+			if (transElements.length < 4) {
+				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			pinCode = transElements[3];
+			maskedPinCode = HelperUtils.maskPassword(pinCode);
+
+			// Swap the originalPassword with the maskedPassword
+			transElements[3] = maskedPinCode;
+
+			// Reconstruct the Original string
+			String originalRequest = "";
+
+			for (int i = 0; i < transElements.length; i++) {
+				originalRequest += transElements[i] + separatorChar;
+			}
+
+			if (!logInBoundMessage(originalRequest)) {
+				return;
+			}
+
+			HelperUtils.writeToLogFile("InBoundMessages", String.format(
+					"%s~%s~%s", referenceId, sourceMsisdn, originalRequest));
+
+			this.sourceCustInfo = CustomerInformation
+					.getCustomerAccountInfo(sourceMsisdn);
+			if (sourceCustInfo == null) {
+				this.destMessage = "You are not authorized to use this service. Please contact Customer Service for more information.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			if (!validatePinCode(pinCode)) {
+				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			ValidationReturnInformation validSrcCustInfo = CustomerInformation
+					.validateCustomerAccountInfo(sourceCustInfo, true);
+			if (!validSrcCustInfo.isPassedValidation()) {
+				HelperUtils.sendSMS(sourceMsisdn,
+						validSrcCustInfo.getValidationMessage(), referenceId);
+				return;
+			}
+
+			if (pinCode.equalsIgnoreCase(HelperUtils.getDefaultPinCode(
+					SystemConfigInfo.getMinPasswordLen(),
+					SystemConfigInfo.getMaxPasswordLen()))) {
+				this.destMessage = "For your own security please change your PIN before doing any transactions.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			SimpleDateFormat inputDateFormatter = new SimpleDateFormat(
+					"ddMMyyyy");
+			SimpleDateFormat outputDateFormatter = new SimpleDateFormat(
+					"dd MM yyyy");
+
+			goalType = transElements[1];
+
+			// Check if goal exists
+			MeToMeGoals allActiveGoals = MeToMeGoals
+					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
+
+			if ((allActiveGoals.isEmpty()) && (allActiveGoals.size() < 1)) {
+				this.destMessage = "You do not have any active goal. Please go to the main menu to create your goal.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			targetGoal = allActiveGoals.get(0);
+
+			if ((transElements[2] == "0")
+					|| (Integer.parseInt(transElements[2]) == 0)) {
+				maturityDate = targetGoal.getMaturityDate();
+			} else {
+				maturityDateStr = transElements[2];
+				maturityDate = inputDateFormatter.parse(maturityDateStr);
+
+				// Validate Maturity Date: Enforce 1 Months savings
+				// Check that the new date is not less than a month from the
+				// date the goal was created
+				Calendar cal1 = Calendar.getInstance();
+				oldCreatedDate = targetGoal.getCreatedTimestamp();
+				cal1.setTime(oldCreatedDate);
+				cal1.add(Calendar.MONTH, 1);
+				
+				Calendar calCurrentTargetDate = Calendar.getInstance();
+				currentTargetDate = targetGoal.getMaturityDate();
+				calCurrentTargetDate.setTime(currentTargetDate);
+
+				if (maturityDate.before(cal1.getTime())) {
+					this.destMessage = String
+							.format("The Goal End Date is Invalid. It has to be at least 1 month from the date of creation. Your %s goal is unchanged.",
+									targetGoal.getGoalName());
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+				
+				if (maturityDate.before(calCurrentTargetDate.getTime())) {
+					this.destMessage = String
+							.format("The Goal End Date is Invalid. You can only have the Goal End Date pushed forward. Your %s goal is unchanged.",
+									targetGoal.getGoalName());
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+			}
+
+			// Make the Transfer
+			boolean retAlter = false;
+
+			retAlter = alterMeToMeGoalDate(sourceCustInfo.getAccountInfo()
+					.getAccountId(), targetGoal.getGoalId(),
+					new SimpleDateFormat("yyyy-MM-dd").format(maturityDate)
+							.toUpperCase(), referenceId,
+					sourceCustInfo.getMsisdn());
+
+			if (!retAlter) {
+				this.destMessage = "Sorry, the Me2Me transaction was not completed due to processing problems.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			String currency = SystemConfigInfo.getCurrencyCode();
+
+			this.destMessage = String
+					.format("REF: %s: You have successfully changed your %s goal.\r\nTarget Amount: %s%,.0f\r\nGoal End Date: %s",
+							referenceId, targetGoal.getGoalName(), currency,
+							targetGoal.getTargetAmount(), outputDateFormatter
+									.format(maturityDate).toUpperCase());
 			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 		} catch (Exception ex) {
 			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
@@ -3687,7 +4110,7 @@ public class TransactionProcessingEngine {
 								"You are already connected to: %s since %s.",
 								CustomerInformation.getDisplayNames(
 										friendCustInfo, false),
-								new SimpleDateFormat("dd-MMM-yyyy")
+								new SimpleDateFormat("dd MM yyyy")
 										.format(existingNetwork
 												.getDateConnected()));
 						HelperUtils.sendSMS(sourceMsisdn, destMessage,
@@ -3910,7 +4333,7 @@ public class TransactionProcessingEngine {
 				this.destMessage = String.format(
 						"You are already connected to: %s since %s.",
 						CustomerInformation.getDisplayNames(invitorCustInfo,
-								false), new SimpleDateFormat("dd-MMM-yyyy")
+								false), new SimpleDateFormat("dd MM yyyy")
 								.format(existingNetwork.getDateConnected()));
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
