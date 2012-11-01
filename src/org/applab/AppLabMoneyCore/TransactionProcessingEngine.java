@@ -2614,9 +2614,7 @@ public class TransactionProcessingEngine {
 						.getUnRedeemedGoalsByCustomer(sourceCustInfo
 								.getCustomerId());
 				if (unRedeemedGoals.size() < 1) {
-					this.destMessage = String
-							.format("You do not have an active or matured goal. Please go to the main menu to create your goal.",
-									targetGoal.getGoalName().toUpperCase());
+					this.destMessage = "You do not have an active or matured goal. Please go to the main menu to create your goal.";
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				}
@@ -2700,7 +2698,7 @@ public class TransactionProcessingEngine {
 						// All money accrued can be redeemed
 						this.destMessage = String
 								.format("You have chosen to stop your %s goal of target amount %,.0f%s. The amount raised will be ready for cash out within 24 hours.",
-										goalType.toUpperCase(),
+										targetGoal.getGoalName().toUpperCase(),
 										targetGoal.getAccruedAmount(),
 										currency,
 										df.format(targetGoal.getMaturityDate()));
