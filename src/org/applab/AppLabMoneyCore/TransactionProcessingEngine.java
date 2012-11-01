@@ -123,7 +123,7 @@ public class TransactionProcessingEngine {
 					"NTRESPINV")) {
 				processNTRESPINV();
 			} else {
-				destMessage = "The Service failed to determine the kind of transaction requested.";
+				destMessage = "The service failed to determine the kind of transaction requested.";
 				HelperUtils.writeToLogFile("console", destMessage);
 				HelperUtils.writeToLogFile("OutBoundMessages", destMessage);
 				// send the SMS
@@ -926,7 +926,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 2) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -960,7 +960,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -983,7 +983,7 @@ public class TransactionProcessingEngine {
 
 			if (sourceCustInfo.getAccountInfo() == null
 					|| sourceCustInfo.getAccountInfo().getAccountId() == 0) {
-				this.destMessage = "Your Account information could not be verified.";
+				this.destMessage = "Your account information could not be verified.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1025,7 +1025,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 4) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1059,7 +1059,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that "
+				this.destMessage = "You have entered an invalid PIN. Note that "
 						+ Integer.toString(SystemConfigInfo
 								.getInvalidPasswordLock())
 						+ " attempts with invalid PIN will block your account.";
@@ -1094,7 +1094,7 @@ public class TransactionProcessingEngine {
 			phoneNumber = transElements[1].trim();
 			destMsisdn = convertMobileNoToMsisdn(phoneNumber);
 			if (destMsisdn.isEmpty()) {
-				this.destMessage = "The Destination Phone Number is invalid.";
+				this.destMessage = "The destination phone number is invalid.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1103,13 +1103,13 @@ public class TransactionProcessingEngine {
 			try {
 				amount = Double.parseDouble(amountStr);
 			} catch (Exception exAmount) {
-				this.destMessage = "The Amount you entered is invalid.";
+				this.destMessage = "The amount you entered is invalid.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
 			if (amount < 0) {
-				this.destMessage = "The Amount to Send must be Positive.";
+				this.destMessage = "The amount to send must be positive.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1133,7 +1133,7 @@ public class TransactionProcessingEngine {
 
 			if (destCustInfo.getAccountInfo() == null
 					|| destCustInfo.getAccountInfo().getAccountId() == 0) {
-				this.destMessage = "The destination Account information could not be verified.";
+				this.destMessage = "The destination account information could not be verified.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1194,7 +1194,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 4) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1228,7 +1228,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1259,7 +1259,7 @@ public class TransactionProcessingEngine {
 			phoneNumber = transElements[1].trim();
 			destMsisdn = convertMobileNoToMsisdn(phoneNumber);
 			if (destMsisdn.isEmpty()) {
-				this.destMessage = "The Destination Phone Number is invalid.";
+				this.destMessage = "The destination phone number is invalid.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1268,13 +1268,13 @@ public class TransactionProcessingEngine {
 			try {
 				amount = Double.parseDouble(amountStr);
 			} catch (Exception exAmount) {
-				this.destMessage = "The Amount you entered is invalid.";
+				this.destMessage = "The amount you entered is invalid.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
 			if (amount < 0) {
-				this.destMessage = "The Deposit Amount must be Positive.";
+				this.destMessage = "The deposit amount must be positive.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1298,7 +1298,7 @@ public class TransactionProcessingEngine {
 
 			if (destCustInfo.getAccountInfo() == null
 					|| destCustInfo.getAccountInfo().getAccountId() == 0) {
-				this.destMessage = "The Account information could not be verified.";
+				this.destMessage = "The account information could not be verified.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1326,7 +1326,7 @@ public class TransactionProcessingEngine {
 			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 
 			this.destMessage = String
-					.format("REF: %s: Please Give %,.0f%s cash to %s as your deposit. Your available balance is: %,.0f%s.",
+					.format("REF: %s: Please give %,.0f%s cash to %s as your deposit. Your available balance is: %,.0f%s.",
 							referenceId, amount, currency, CustomerInformation
 									.getDisplayNames(sourceCustInfo, true),
 							destBalAfter, currency);
@@ -1358,7 +1358,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 3) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1396,7 +1396,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(oldPassword)) {
-				this.destMessage = "You have entered an Invalid Old PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid old PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1410,7 +1410,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (newPassword.equalsIgnoreCase(sourceCustInfo.getPinCode())) {
-				this.destMessage = "Your New PIN must be different from your old PIN.";
+				this.destMessage = "Your new PIN must be different from your old PIN.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1443,7 +1443,7 @@ public class TransactionProcessingEngine {
 					this.sourceCustInfo.getCustomerId(), newPassword);
 
 			if (!retUpdate) {
-				this.destMessage = "The System encountered a problem while processing your request. Please contact Customer Service for more Information.";
+				this.destMessage = "The system encountered a problem while processing your request. Please contact Customer Service for more information.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1488,7 +1488,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 12) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1522,7 +1522,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1553,7 +1553,7 @@ public class TransactionProcessingEngine {
 			phoneNumber = transElements[1].trim();
 			phoneMsisdn = convertMobileNoToMsisdn(phoneNumber);
 			if (phoneMsisdn.isEmpty()) {
-				this.destMessage = "The Phone Number for the new Customer is not valid.";
+				this.destMessage = "The phone number for the new customer is not valid.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1561,7 +1561,7 @@ public class TransactionProcessingEngine {
 			CustomerInformation existingCustInfo = CustomerInformation
 					.getCustomerAccountInfo(phoneMsisdn);
 			if (existingCustInfo != null) {
-				this.destMessage = "Another Customer is already registered with the specified Phone Number.";
+				this.destMessage = "Another customer is already registered with the specified phone number.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1595,7 +1595,7 @@ public class TransactionProcessingEngine {
 					sourceCustInfo.getCustomerId());
 
 			if (!retCreateCust) {
-				this.destMessage = "The system encountered problems while Registering the new Customer.";
+				this.destMessage = "The system encountered problems while registering the new customer.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1603,7 +1603,7 @@ public class TransactionProcessingEngine {
 			CustomerInformation newCustInfo = CustomerInformation
 					.getNewCustomerInfo(phoneMsisdn);
 			if (newCustInfo == null) {
-				this.destMessage = "The system encountered problems while Registering the new Customer.";
+				this.destMessage = "The system encountered problems while registering the new customer.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1612,7 +1612,7 @@ public class TransactionProcessingEngine {
 					newCustInfo.getCustomerId(),
 					newCustInfo.getAccountTypeBitmap());
 			if (!retCreateAccount) {
-				this.destMessage = "The system encountered problems while Registering the new Customer.";
+				this.destMessage = "The system encountered problems while registering the new customer.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1620,8 +1620,8 @@ public class TransactionProcessingEngine {
 			String fullNames = lastName.concat(" ").concat(otherNames)
 					.toUpperCase();
 
-			this.destMessage = "The New Customer: " + fullNames + " of Phone: "
-					+ phoneMsisdn + " has been Registered Successfully.";
+			this.destMessage = "The new customer: " + fullNames + " of phone: "
+					+ phoneMsisdn + " has been registered successfully.";
 			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 
 			this.destMessage = "Welcome to AppLab Money. Your PIN is "
@@ -1656,7 +1656,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 4) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1690,7 +1690,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that "
+				this.destMessage = "You have entered an invalid PIN. Note that "
 						+ Integer.toString(SystemConfigInfo
 								.getInvalidPasswordLock())
 						+ " attempts with invalid PIN will block your account.";
@@ -1727,13 +1727,13 @@ public class TransactionProcessingEngine {
 			try {
 				amount = Double.parseDouble(amountStr);
 			} catch (Exception exAmount) {
-				this.destMessage = "The Amount you entered is invalid.";
+				this.destMessage = "The amount you entered is invalid.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
 			if (amount < 0) {
-				this.destMessage = "The Amount to Withdraw must be Positive.";
+				this.destMessage = "The amount to withdraw must be positive.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1757,14 +1757,14 @@ public class TransactionProcessingEngine {
 
 			if (destCustInfo.getAccountInfo() == null
 					|| destCustInfo.getAccountInfo().getAccountId() == 0) {
-				this.destMessage = "The Account information could not be verified.";
+				this.destMessage = "The account information could not be verified.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
 			int destAccountTypeBitmap = destCustInfo.getAccountTypeBitmap();
 			if ((destAccountTypeBitmap & (HelperUtils.BITMAP_AGNT | HelperUtils.BITMAP_DLER)) == 0) {
-				this.destMessage = "The Agent Code you have specified is barred from processing withdrawals. Please contact Customer Service for more information.";
+				this.destMessage = "The agent code you have specified is barred from processing withdrawals. Please contact Customer Service for more information.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1785,7 +1785,7 @@ public class TransactionProcessingEngine {
 					.getBookBalance() + amount;
 
 			this.destMessage = String
-					.format("REF: %s: You have Withdrawn %,.0f%s at %s. Your available balance is: %,.0f%s.",
+					.format("REF: %s: You have withdrawn %,.0f%s at %s. Your available balance is: %,.0f%s.",
 							referenceId, amount, currency, CustomerInformation
 									.getDisplayNames(destCustInfo, true)
 									.toUpperCase(), sourceBalAfter, currency);
@@ -1831,7 +1831,6 @@ public class TransactionProcessingEngine {
 		String pinCode = "";
 		String maskedPinCode = "";
 		String separatorChar = " ";
-		int countOfMonths = 1;
 
 		try {
 
@@ -1845,7 +1844,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 7) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1879,7 +1878,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1926,7 +1925,7 @@ public class TransactionProcessingEngine {
 			cal.add(Calendar.MONTH, 1);
 
 			if (maturityDate.before(cal.getTime())) {
-				this.destMessage = "The Goal End Date is Invalid. It has to be at least 1 month in the future. Please create a new goal.";
+				this.destMessage = "The goal end date is invalid. It has to be at least 1 month in the future. Please create a new goal.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1935,7 +1934,7 @@ public class TransactionProcessingEngine {
 			boolean retActivatedMe2Me = MeToMeCommon
 					.checkMeToMeActivation(sourceCustInfo.getCustomerId());
 			if (!retActivatedMe2Me) {
-				this.destMessage = "You must first activate your Me2Me Wallet in order to access the service features. Please contact Customer Service for more Information.";
+				this.destMessage = "You must first activate your me2me wallet in order to access the service features. Please contact Customer Service for more information.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1946,8 +1945,8 @@ public class TransactionProcessingEngine {
 							sourceCustInfo.getCustomerId(), goalType);
 			if (activeGoals.size() > 0) {
 				this.destMessage = String
-						.format("You already have %d active goal of the same type. Multiple goals of the same type are currently not supported",
-								activeGoals.size());
+						.format("You have already created the goal %s.You can only have one me2me goal at a time",
+								goalType.toUpperCase());
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -1957,7 +1956,7 @@ public class TransactionProcessingEngine {
 					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
 			if (allActiveGoals.size() >= 1) {
 				this.destMessage = String.format(
-						"You already have an active goal: %s", allActiveGoals
+						"You already created the goal: %s. You can only have one me2me goal at a time ", allActiveGoals
 								.get(0).getGoalName().toUpperCase());
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
@@ -1968,7 +1967,7 @@ public class TransactionProcessingEngine {
 					liquidityOption);
 
 			if (!retCreateGoal) {
-				this.destMessage = "The System encountered a problem while creating your goal. Please contact Customer Service for more Information.";
+				this.destMessage = "The system encountered a problem while creating your goal. Please contact Customer Service for more information.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2013,7 +2012,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 4) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2057,7 +2056,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2085,7 +2084,7 @@ public class TransactionProcessingEngine {
 				phoneNumber = transElements[1].trim();
 				destMsisdn = convertMobileNoToMsisdn(phoneNumber);
 				if (destMsisdn.isEmpty()) {
-					this.destMessage = "The Destination Phone Number is invalid.";
+					this.destMessage = "The destination phone number is invalid.";
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				}
@@ -2103,7 +2102,7 @@ public class TransactionProcessingEngine {
 
 				if (destCustInfo.getAccountInfo() == null
 						|| destCustInfo.getAccountInfo().getAccountId() == 0) {
-					this.destMessage = "The Account information could not be verified.";
+					this.destMessage = "The account information could not be verified.";
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				}
@@ -2114,13 +2113,13 @@ public class TransactionProcessingEngine {
 			try {
 				amount = Double.parseDouble(amountStr);
 			} catch (Exception exAmount) {
-				this.destMessage = "The Amount you entered is invalid.";
+				this.destMessage = "The amount you entered is invalid.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
 			if (amount < 0) {
-				this.destMessage = "The Payment Amount must be Positive.";
+				this.destMessage = "The payment amount must be positive.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2139,7 +2138,7 @@ public class TransactionProcessingEngine {
 					return;
 				} else {
 					this.destMessage = String
-							.format("The Beneficiary %s does not have an Active %s Goal. Please ask the beneficiary to first create a goal.",
+							.format("The beneficiary %s does not have an active %s goal. Please ask the beneficiary to first create a goal.",
 									CustomerInformation.getDisplayNames(
 											destCustInfo, false).toUpperCase(),
 									goalType.toUpperCase());
@@ -2148,7 +2147,7 @@ public class TransactionProcessingEngine {
 					// Notify the Beneficiary Customer
 					if (allActiveGoals.size() < 1) {
 						this.destMessage = String
-								.format("The Sponsor %s attempted to Pay %,.0f%s into your %s Goal, but you do not have any active goals. Please first create the goal then notify the sponsor.",
+								.format("The sponsor %s attempted to pay %,.0f%s into your %s goal, but you do not have any active goals. Please first create the goal then notify the sponsor.",
 										CustomerInformation.getDisplayNames(
 												sourceCustInfo, false)
 												.toUpperCase(), amount,
@@ -2170,7 +2169,7 @@ public class TransactionProcessingEngine {
 							}
 						}
 						this.destMessage = String
-								.format("The Sponsor %s attempted to Pay %,.0f%s into your %s Goal, but your Active goals are: %s. Please notify the sponsor.",
+								.format("The sponsor %s attempted to pay %,.0f%s into your %s goal, but your active goals are: %s. Please notify the sponsor.",
 										CustomerInformation.getDisplayNames(
 												sourceCustInfo, false)
 												.toUpperCase(), amount,
@@ -2190,7 +2189,7 @@ public class TransactionProcessingEngine {
 
 			if (this.sourceCustInfo.getAccountInfo() == null
 					|| this.sourceCustInfo.getAccountInfo().getBookBalance() < amount) {
-				this.destMessage = "You do not have sufficient funds to process the Payment.";
+				this.destMessage = "You do not have sufficient funds to process the payment.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2211,7 +2210,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!retTransfer) {
-				this.destMessage = "Sorry, the Me2Me transaction was not completed due to processing problems.";
+				this.destMessage = "Sorry, the me2me transaction was not completed due to processing problems.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2234,7 +2233,7 @@ public class TransactionProcessingEngine {
 			} else {
 
 				this.destMessage = String
-						.format("REF: %s: You have sent %,.0f%s to the %s Goal for %s. Your available balance is: %,.0f%s. ",
+						.format("REF: %s: You have sent %,.0f%s to the %s goal for %s. Your available balance is: %,.0f%s. ",
 								referenceId,
 								amount,
 								currency,
@@ -2245,7 +2244,7 @@ public class TransactionProcessingEngine {
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 
 				this.destMessage = String
-						.format("REF: %s: The Sponsor %s has sent %,.0f%s to your %s Goal. The Balance for the Goal is now: %,.0f%s. ",
+						.format("REF: %s: The sponsor %s has sent %,.0f%s to your %s goal. The amount raised for the goal is now: %,.0f%s. ",
 								referenceId, CustomerInformation
 										.getDisplayNames(sourceCustInfo, false)
 										.toUpperCase(), amount, currency,
@@ -2279,7 +2278,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 3) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2313,7 +2312,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2397,7 +2396,6 @@ public class TransactionProcessingEngine {
 		String maskedPinCode = "";
 		String separatorChar = " ";
 		MeToMeGoal targetGoal = null;
-		StringBuilder sb = null;
 
 		try {
 
@@ -2411,7 +2409,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 3) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2445,7 +2443,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2481,7 +2479,7 @@ public class TransactionProcessingEngine {
 
 			if ((allActiveGoals.isEmpty()) && (allActiveGoals.size() < 1)) {
 				this.destMessage = String
-						.format("You do not have an Active Goal for: %s. Please go to the main menu to create your goal.",
+						.format("You do not have an active goal for: %s. Please go to the main menu to create your goal.",
 								goalType.toUpperCase());
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
@@ -2543,7 +2541,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 3) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2577,7 +2575,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2617,7 +2615,7 @@ public class TransactionProcessingEngine {
 								.getCustomerId());
 				if (unRedeemedGoals.size() < 1) {
 					this.destMessage = String
-							.format("You do not have an Active or Matured Goal. Please go to the main menu to create your goal.",
+							.format("You do not have an active or matured goal. Please go to the main menu to create your goal.",
 									targetGoal.getGoalName().toUpperCase());
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
@@ -2668,7 +2666,7 @@ public class TransactionProcessingEngine {
 				// Verify again that Goal is not Redeemed
 				if (targetGoal.isRedeemed()) {
 					this.destMessage = String
-							.format("The %s Goal you are trying to redeem is already redeemed. The redemption was on %s. Please contact Customer Care for assistance.",
+							.format("The %s goal you are trying to redeem is already redeemed. The redemption was on %s. Please contact Customer Care for assistance.",
 									targetGoal.getGoalName().toUpperCase(),
 									df.format(targetGoal.getDateRedeemed())
 											.toUpperCase());
@@ -2701,7 +2699,7 @@ public class TransactionProcessingEngine {
 
 						// All money accrued can be redeemed
 						this.destMessage = String
-								.format("You have chosen to stop your %s goal of target amount %,.0f%s prior to the goal end date. The Amount Raised will be ready for cash out within 24 hours.",
+								.format("You have chosen to stop your %s goal of target amount %,.0f%s. The amount raised will be ready for cash out within 24 hours.",
 										goalType.toUpperCase(),
 										targetGoal.getAccruedAmount(),
 										currency,
@@ -2749,7 +2747,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 3) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2787,13 +2785,13 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!pinCode.equalsIgnoreCase(confirmPinCode)) {
-				this.destMessage = "The PIN and the Confirmation do not match.";
+				this.destMessage = "The PIN and the confirmation do not match.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2875,7 +2873,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 4) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2909,7 +2907,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2975,7 +2973,7 @@ public class TransactionProcessingEngine {
 					accruedGoalBalance, reasonStopped);
 
 			if (!retStopGoal) {
-				this.destMessage = "Sorry, the Me2Me transaction was not completed due to processing problems.";
+				this.destMessage = "Sorry, the me2me transaction was not completed due to processing problems.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -2988,7 +2986,7 @@ public class TransactionProcessingEngine {
 					.getTargetAmount()) * 100;
 
 			this.destMessage = String
-					.format("REF: %s: The accumulated amount of %s%,.0f from your Stopped %s Goal was credited back into your main account. Your main account balance is %,.0f%s.",
+					.format("REF: %s: The accumulated amount of %s%,.0f from your stopped %s goal was credited back into your main account. Your main account balance is %,.0f%s.",
 							referenceId, currency, accruedGoalBalance,
 							targetGoal.getGoalName().toUpperCase(),
 							bookBalance, currency);
@@ -3026,7 +3024,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 5) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3060,7 +3058,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3102,13 +3100,13 @@ public class TransactionProcessingEngine {
 			try {
 				amount = Double.parseDouble(amountStr);
 			} catch (Exception exAmount) {
-				this.destMessage = "The Amount you entered is invalid.";
+				this.destMessage = "The amount you entered is invalid.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
 			if (amount < 0) {
-				this.destMessage = "The Amount must be Positive.";
+				this.destMessage = "The amount must be positive.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3141,7 +3139,7 @@ public class TransactionProcessingEngine {
 							targetGoal.getGoalId(), amount, withdrawReason);
 
 					if (!retRebate) {
-						this.destMessage = "Sorry, the Me2Me transaction was not completed due to processing problems.";
+						this.destMessage = "Sorry, the me2me transaction was not completed due to processing problems.";
 						HelperUtils.sendSMS(sourceMsisdn, destMessage,
 								referenceId);
 						return;
@@ -3154,7 +3152,7 @@ public class TransactionProcessingEngine {
 							reasonStopped);
 
 					if (!retStopGoal) {
-						this.destMessage = "Sorry, the Me2Me transaction was not completed due to processing problems.";
+						this.destMessage = "Sorry, the me2me transaction was not completed due to processing problems.";
 						HelperUtils.sendSMS(sourceMsisdn, destMessage,
 								referenceId);
 						return;
@@ -3228,7 +3226,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 5) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3262,7 +3260,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3314,7 +3312,7 @@ public class TransactionProcessingEngine {
 				if ((targetAmount < 500) || (targetAmount > 10000000)
 						&& (targetAmount != targetGoal.getTargetAmount())) {
 					this.destMessage = String
-							.format("The Target Amount is invalid. Your target amount must be above UGX500 and not exceed UGX10,000,000. Your %s goal is unchanged.",
+							.format("The target amount is invalid. Your target amount must be above UGX500 and not exceed UGX10,000,000. Your %s goal is unchanged.",
 									goalType.toUpperCase());
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
@@ -3337,7 +3335,7 @@ public class TransactionProcessingEngine {
 
 				if (maturityDate.before(cal1.getTime())) {
 					this.destMessage = String
-							.format("The Goal End Date is Invalid. It has to be at least 1 month from the date of creation. Your %s goal is unchanged.",
+							.format("The goal end date is invalid. It has to be at least 1 month from the date of creation. Your %s goal is unchanged.",
 									targetGoal.getGoalName());
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
@@ -3354,7 +3352,7 @@ public class TransactionProcessingEngine {
 					sourceCustInfo.getMsisdn());
 
 			if (!retAlter) {
-				this.destMessage = "Sorry, the Me2Me transaction was not completed due to processing problems.";
+				this.destMessage = "Sorry, the me2me transaction was not completed due to processing problems.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3405,7 +3403,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 4) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3439,7 +3437,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3485,7 +3483,7 @@ public class TransactionProcessingEngine {
 				if ((targetAmount < 500) || (targetAmount > 10000000)
 						&& (targetAmount != targetGoal.getTargetAmount())) {
 					this.destMessage = String
-							.format("The Target Amount is invalid. Your target amount must be above UGX500 and not exceed UGX10,000,000. Your %s goal is unchanged.",
+							.format("The target amount is invalid. Your target amount must be above UGX500 and not exceed UGX10,000,000. Your %s goal is unchanged.",
 									goalType.toUpperCase());
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
@@ -3500,7 +3498,7 @@ public class TransactionProcessingEngine {
 					referenceId, sourceCustInfo.getMsisdn());
 
 			if (!retAlter) {
-				this.destMessage = "Sorry, the Me2Me transaction was not completed due to processing problems.";
+				this.destMessage = "Sorry, the me2me transaction was not completed due to processing problems.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3550,7 +3548,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length < 4) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3584,7 +3582,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3645,7 +3643,7 @@ public class TransactionProcessingEngine {
 
 				if (maturityDate.before(cal1.getTime())) {
 					this.destMessage = String
-							.format("The Goal End Date is Invalid. It has to be at least 1 month from the date of creation. Your %s goal is unchanged.",
+							.format("The Goal End Date is invalid. It has to be at least 1 month from the date of creation. Your %s goal is unchanged.",
 									targetGoal.getGoalName());
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
@@ -3653,7 +3651,7 @@ public class TransactionProcessingEngine {
 				
 				if (maturityDate.before(calCurrentTargetDate.getTime())) {
 					this.destMessage = String
-							.format("The Goal End Date is Invalid. You can only have the Goal End Date pushed forward. Your %s goal is unchanged.",
+							.format("The goal end date is invalid. You can only have the goal end date pushed forward. Your %s goal is unchanged.",
 									targetGoal.getGoalName());
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
@@ -3714,7 +3712,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length != 3) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3748,7 +3746,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3799,7 +3797,7 @@ public class TransactionProcessingEngine {
 				friendMsisdn = convertMobileNoToMsisdn(phoneNumbers[i]);
 				if (friendMsisdn.isEmpty()) {
 					this.destMessage = String
-							.format("The Phone Number that you specified: %s is invalid. The system could not send an Invitation Message to your friend.",
+							.format("The phone number that you specified: %s is invalid. The system could not send an invitation message to your friend.",
 									phoneNumbers[i]);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					continue;
@@ -3818,7 +3816,7 @@ public class TransactionProcessingEngine {
 					HelperUtils.sendSMS(friendMsisdn, destMessage, referenceId);
 				} else {
 					this.destMessage = String
-							.format("Please join my Zimba network so that we can borrow and lend each other cash using Mobile Money. Thanks. %s.",
+							.format("Please join my Zimba network so that we can borrow and lend each other cash using Mobile Money. Thank you. %s.",
 									CustomerInformation.getDisplayNames(
 											sourceCustInfo, false));
 					HelperUtils.sendSMS(friendMsisdn, destMessage, referenceId);
@@ -3827,11 +3825,11 @@ public class TransactionProcessingEngine {
 				// Inform the sender that the Invitation request has been sent
 				if (friendCustInfo == null) {
 					this.destMessage = String
-							.format("Your Invitation to %s to join your Zimba network has been sent successfully.",
+							.format("Your invitation to %s to join your Zimba network has been sent successfully.",
 									phoneNumbers[i]);
 				} else {
 					this.destMessage = String
-							.format("Your Invitation to %s to join your Zimba network has been sent successfully.",
+							.format("Your invitation to %s to join your Zimba network has been sent successfully.",
 									CustomerInformation.getDisplayNames(
 											friendCustInfo, false));
 				}
@@ -3869,7 +3867,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length != 4) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3903,7 +3901,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3943,7 +3941,7 @@ public class TransactionProcessingEngine {
 			boolean retValCheckZimbaActivation = ZimbaCommon
 					.checkZimbaActivation(sourceCustInfo.getCustomerId());
 			if (retValCheckZimbaActivation) {
-				this.destMessage = "You are already Activated on Zimba.";
+				this.destMessage = "You are already activated on Zimba.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3956,17 +3954,17 @@ public class TransactionProcessingEngine {
 					sourceCustInfo, networkSize, networkRole);
 
 			if (!retActivateZimba) {
-				this.destMessage = "The System encountered a problem while activating your Zimba Network. Please contact Customer Service for more Information.";
+				this.destMessage = "The system encountered a problem while activating your Zimba network. Please contact Customer Service for more information.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
 			if (networkRole.toUpperCase().startsWith("BORROW")) {
-				this.destMessage = "You have successfully activated your Zimba Network. You can now invite people to join your network and start Borrowing from your friends right from your handset!";
+				this.destMessage = "You have successfully activated your Zimba network. You can now invite people to join your network and start Borrowing from your friends right from your handset!";
 			} else if (networkRole.toUpperCase().startsWith("LEND")) {
-				this.destMessage = "You have successfully activated your Zimba Network. You can now invite people to join your network and start Lending to your friends right from your handset!";
+				this.destMessage = "You have successfully activated your Zimba network. You can now invite people to join your network and start Lending to your friends right from your handset!";
 			} else {
-				this.destMessage = "You have successfully activated your Zimba Network. You can now invite people to join your network and start Borrowing and Lending right from your handset!";
+				this.destMessage = "You have successfully activated your Zimba network. You can now invite people to join your network and start Borrowing and Lending right from your handset!";
 			}
 
 			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
@@ -4001,7 +3999,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length != 3) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -4035,7 +4033,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -4086,7 +4084,7 @@ public class TransactionProcessingEngine {
 				friendMsisdn = convertMobileNoToMsisdn(phoneNumbers[i]);
 				if (friendMsisdn.isEmpty()) {
 					this.destMessage = String
-							.format("The Phone Number that you specified: %s is invalid. The system could not send an Invitation Message to your friend.",
+							.format("The phone number that you specified: %s is invalid. The system could not send an invitation message to your friend.",
 									phoneNumbers[i]);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					continue;
@@ -4129,13 +4127,13 @@ public class TransactionProcessingEngine {
 
 					isReminderInvitation = true;
 					this.destMessage = String
-							.format("You already have a pending invitation to your friend of Phone Number: %s. A reminder will be sent to your friend.",
+							.format("You already have a pending invitation to your friend of phone number: %s. A reminder will be sent to your friend.",
 									phoneNumbers[i]);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 
 					// Send reminder to friend
 					this.destMessage = String
-							.format("I kindly remind you to respond to my Invitation to Join my Zimba Network so that we can borrow and lend each other cash using the mobile phone. Thanks. %s.",
+							.format("I kindly remind you to respond to my invitation to join my zimba network so that we can borrow and lend each other cash using the mobile phone. Thank you. %s.",
 									CustomerInformation.getDisplayNames(
 											sourceCustInfo, false));
 					HelperUtils.sendSMS(friendMsisdn, destMessage, referenceId);
@@ -4147,14 +4145,14 @@ public class TransactionProcessingEngine {
 					// Confirm that the Friend exists
 					if (friendCustInfo == null) {
 						this.destMessage = String
-								.format("Please join MTN Mobile Money and join my Zimba network so that we can borrow and lend each other cash using the mobile phone. Thanks. %s.",
+								.format("Please join MTN Mobile Money and join my Zimba network so that we can borrow and lend each other cash using the mobile phone. Thank you. %s.",
 										CustomerInformation.getDisplayNames(
 												sourceCustInfo, false));
 						HelperUtils.sendSMS(friendMsisdn, destMessage,
 								referenceId);
 					} else {
 						this.destMessage = String
-								.format("Please join my Zimba network so that we can borrow and lend each other cash using Mobile Money. Thanks. %s.",
+								.format("Please join my Zimba network so that we can borrow and lend each other cash using Mobile Money. Thank you. %s.",
 										CustomerInformation.getDisplayNames(
 												sourceCustInfo, false));
 						HelperUtils.sendSMS(friendMsisdn, destMessage,
@@ -4166,11 +4164,11 @@ public class TransactionProcessingEngine {
 				if (!isReminderInvitation) {
 					if (friendCustInfo == null) {
 						this.destMessage = String
-								.format("Your Invitation to %s to join your Zimba network has been sent successfully.",
+								.format("Your invitation to %s to join your Zimba network has been sent successfully.",
 										phoneNumbers[i]);
 					} else {
 						this.destMessage = String
-								.format("Your Invitation to %s to join your Zimba network has been sent successfully.",
+								.format("Your invitation to %s to join your Zimba network has been sent successfully.",
 										CustomerInformation.getDisplayNames(
 												friendCustInfo, false));
 					}
@@ -4227,7 +4225,7 @@ public class TransactionProcessingEngine {
 			this.sourceMsisdn = formedSrcMsisdn;
 			transElements = requestCommand.split(separatorChar);
 			if (transElements.length != 5) {
-				this.destMessage = "Invalid Command Format. Some Parameters are Missing.";
+				this.destMessage = "Invalid command format. Some parameters are missing.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -4261,7 +4259,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an Invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -4307,7 +4305,7 @@ public class TransactionProcessingEngine {
 			String invitorMsisdn = convertMobileNoToMsisdn(phoneNumber);
 			if (invitorMsisdn.isEmpty()) {
 				this.destMessage = String
-						.format("You have specified an Invalid Phone Number: %s. Kindly confirm the correct number from the Invitation Message and try again.",
+						.format("You have specified an invalid phone number: %s. Kindly confirm the correct number from the invitation Message and try again.",
 								phoneNumber);
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
@@ -4318,7 +4316,7 @@ public class TransactionProcessingEngine {
 					.getCustomerAccountInfo(invitorMsisdn);
 			if (invitorCustInfo == null) {
 				this.destMessage = String
-						.format("The system failed to find details for your friend of Phone Number: %s. Kindly confirm the correct number from the Invitation Message and try again.",
+						.format("The system failed to find details for your friend of phone number: %s. Kindly confirm the correct number from the invitation message and try again.",
 								phoneNumber);
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
@@ -4346,7 +4344,7 @@ public class TransactionProcessingEngine {
 							sourceCustInfo.getMsisdn());
 			if (zimbaInvitations == null || zimbaInvitations.size() < 1) {
 				this.destMessage = String
-						.format("You do not have any pending invitation from the owner of the Phone Number: %s. If the person is your friend, you can send a Zimba Invitation to the person.",
+						.format("You do not have any pending invitation from the owner of the phone number: %s. If the person is your friend, you can send a Zimba invitation to the person.",
 								phoneNumber);
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
@@ -4368,7 +4366,7 @@ public class TransactionProcessingEngine {
 
 			if (!respInvite) {
 				this.destMessage = String
-						.format("The system encountered a problem while processing your response to the Zimba Invitation by: %s. Please try again later or contact Customer Care.",
+						.format("The system encountered a problem while processing your response to the Zimba invitation by: %s. Please try again later or contact Customer Care.",
 								CustomerInformation.getDisplayNames(
 										invitorCustInfo, false));
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
@@ -4389,7 +4387,7 @@ public class TransactionProcessingEngine {
 				// TODO: I need to be able to set friendship levels for the
 				// Invitor also
 				this.destMessage = String
-						.format("Congratulations! %s has just Accepted your Zimba Invitation and you are now connected.",
+						.format("Congratulations! %s has just accepted your Zimba invitation and you are now connected.",
 								CustomerInformation.getDisplayNames(
 										sourceCustInfo, false));
 				HelperUtils.sendSMS(invitorMsisdn, destMessage, referenceId);
@@ -4398,14 +4396,14 @@ public class TransactionProcessingEngine {
 
 				// Message to the Invited
 				this.destMessage = String
-						.format("Your Decline response to the Zimba Invitation by %s has been processed successfully. You can still connect later by sending the person an Invitation.",
+						.format("Your decline response to the Zimba invitation by %s has been processed successfully. You can still connect later by sending the person an invitation.",
 								CustomerInformation.getDisplayNames(
 										invitorCustInfo, false));
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 
 				// Message to the Inviter
 				this.destMessage = String
-						.format("Sorry, %s has Declined your Zimba Invitation. You can still connect later.",
+						.format("Sorry, %s has declined your Zimba invitation. You can still connect later.",
 								CustomerInformation.getDisplayNames(
 										sourceCustInfo, false));
 				HelperUtils.sendSMS(invitorMsisdn, destMessage, referenceId);
