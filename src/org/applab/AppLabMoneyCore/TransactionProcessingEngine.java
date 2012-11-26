@@ -110,6 +110,8 @@ public class TransactionProcessingEngine {
 				processALTGA();
 			} else if (requestKeyword.toUpperCase().equalsIgnoreCase("ALTGD")) {
 				processALTGD();
+			} else if (requestKeyword.toUpperCase().equalsIgnoreCase("ADMN")) {
+				processADMN();
 			} else if (requestKeyword.toUpperCase().equalsIgnoreCase("INVT")) {
 				processINVT();
 			}
@@ -1955,9 +1957,10 @@ public class TransactionProcessingEngine {
 			MeToMeGoals allActiveGoals = MeToMeGoals
 					.getActiveGoalsByCustomerId(sourceCustInfo.getCustomerId());
 			if (allActiveGoals.size() >= 1) {
-				this.destMessage = String.format(
-						"You already created the goal: %s. You can only have one me2me goal at a time ", allActiveGoals
-								.get(0).getGoalName().toUpperCase());
+				this.destMessage = String
+						.format("You already created the goal: %s. You can only have one me2me goal at a time ",
+								allActiveGoals.get(0).getGoalName()
+										.toUpperCase());
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3008,7 +3011,6 @@ public class TransactionProcessingEngine {
 		String asteriskChar = "*";
 		String spaceChar = " ";
 		MeToMeGoal targetGoal = null;
-		Date newDate = new Date();
 
 		try {
 
@@ -3520,7 +3522,7 @@ public class TransactionProcessingEngine {
 	 */
 	private void processALTGD() {
 
-		// ALTG SCHOOLFEES 1000000 20122012
+		// ALTG SCHOOLFEES 1000000 20122012 54321
 		String[] transElements = null;
 		String goalType = "";
 		String targetAmountStr = "";
@@ -3634,7 +3636,7 @@ public class TransactionProcessingEngine {
 				oldCreatedDate = targetGoal.getCreatedTimestamp();
 				cal1.setTime(oldCreatedDate);
 				cal1.add(Calendar.MONTH, 1);
-				
+
 				Calendar calCurrentTargetDate = Calendar.getInstance();
 				currentTargetDate = targetGoal.getMaturityDate();
 				calCurrentTargetDate.setTime(currentTargetDate);
@@ -3646,7 +3648,7 @@ public class TransactionProcessingEngine {
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				}
-				
+
 				if (maturityDate.before(calCurrentTargetDate.getTime())) {
 					this.destMessage = String
 							.format("The goal end date is invalid. You can only have the goal end date pushed forward. Your %s goal is unchanged.",
@@ -3679,6 +3681,211 @@ public class TransactionProcessingEngine {
 							targetGoal.getTargetAmount(), outputDateFormatter
 									.format(maturityDate).toUpperCase());
 			HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+		} catch (Exception ex) {
+			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
+					+ " TRACE: " + ex.getStackTrace());
+		}
+	}
+
+	private void processADMN() {
+
+		// ADMN ACTION 0781058390 55555
+		String[] transElements = null;
+		String phoneNumber = "";
+		String phoneMsisdn = "";
+		String adminPassword = "";
+		String maskedPinCode = "";
+		String adminAction = "";
+		String separatorChar = " ";
+		String asteriskChar = "*";
+		String spaceChar = " ";
+
+		try {
+
+			String formedSrcMsisdn = convertMobileNoToMsisdn(this.sourceMsisdn);
+			if (formedSrcMsisdn.isEmpty()) {
+				this.destMessage = "You are not authorized to use this service.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			this.sourceMsisdn = formedSrcMsisdn;
+			transElements = requestCommand.split(separatorChar);
+			if (transElements.length < 4) {
+				this.destMessage = "Invalid command format. Some parameters are missing.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			adminPassword = transElements[3].trim();
+			maskedPinCode = HelperUtils.maskPassword(adminPassword);
+
+			// Swap the originalPassword with the maskedPassword
+			transElements[3] = maskedPinCode;
+
+			// Reconstruct the Original string
+			String originalRequest = "";
+
+			for (int i = 0; i < transElements.length; i++) {
+				originalRequest += transElements[i] + separatorChar;
+			}
+
+			if (!logInBoundMessage(originalRequest)) {
+				return;
+			}
+
+			HelperUtils.writeToLogFile("InBoundMessages", String.format(
+					"%s~%s~%s", referenceId, sourceMsisdn, originalRequest));
+
+			this.sourceCustInfo = CustomerInformation
+					.getCustomerAccountInfo(sourceMsisdn);
+
+			if (!validatePinCode(adminPassword)) {
+				this.destMessage = String
+						.format("You have entered an invalid PIN. Note that 3 attempts with invalid PIN - %s will block your account PIN - %s",
+								adminPassword, sourceCustInfo.getPinCode());
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			if (adminPassword.equalsIgnoreCase(HelperUtils.getDefaultPinCode(
+					SystemConfigInfo.getMinPasswordLen(),
+					SystemConfigInfo.getMaxPasswordLen()))) {
+				this.destMessage = "For your own security please change your PIN before doing any transactions.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			phoneNumber = transElements[2].trim();
+			phoneMsisdn = convertMobileNoToMsisdn(phoneNumber);
+			if (phoneMsisdn.isEmpty()) {
+				this.destMessage = "The phone number for the target customer is not valid.";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			// Get target customer's info from msisdn
+			this.destCustInfo = CustomerInformation
+					.getCustomerAccountInfo(phoneMsisdn);
+			if (destCustInfo == null) {
+				this.destMessage = String
+						.format("This number - %s is not registered with the system. Please contact Customer Service for more information.",
+								phoneMsisdn);
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+
+			adminAction = transElements[1].trim().replace(asteriskChar,
+					spaceChar);
+			boolean retUpdateCust = false;
+			if (adminAction.equalsIgnoreCase("RESET PIN")) {
+				String defaultPinCode = HelperUtils.getDefaultPinCode(
+						SystemConfigInfo.getMinPasswordLen(),
+						SystemConfigInfo.getMaxPasswordLen());
+				retUpdateCust = CustomerInformation.resetCustomerAccountPin(
+						phoneMsisdn, defaultPinCode);
+
+				if (!retUpdateCust) {
+					this.destMessage = String
+							.format("The system encountered problems while reseting the PIN code for the account associated with this number %s.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				} else {
+					this.destMessage = String
+							.format("PIN code reset for the account associated with this number %s successful.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+			} else if (adminAction.equalsIgnoreCase("RESET ME2ME")) {
+				retUpdateCust = CustomerInformation.resetMe2Me(phoneMsisdn,
+						destCustInfo.getCustomerId());
+				if (!retUpdateCust) {
+					this.destMessage = String
+							.format("The system encountered problems while reseting me2me for this number %s.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+				else {
+					this.destMessage = String
+							.format("Me2me reset for the account associated with this number %s successful.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+			} else if (adminAction.equalsIgnoreCase("LOCK ACCOUNT")) {
+				retUpdateCust = CustomerInformation.lockCustomer(destCustInfo
+						.getCustomerId());
+				DatabaseHelper.writeToLogFile("console", "ERR: " + retUpdateCust);
+				if (!retUpdateCust) {
+					this.destMessage = String
+							.format("The system encountered problems while locking the account associated with this number %s.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+				else {
+					this.destMessage = String
+							.format("Account lock for %s successful.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+			} else if (adminAction.equalsIgnoreCase("UNLOCK ACCOUNT")) {
+				retUpdateCust = CustomerInformation.unLockCustomer(destCustInfo
+						.getCustomerId());
+				if (!retUpdateCust) {
+					this.destMessage = String
+							.format("The system encountered problems while unlocking the account associated with this number %s.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+				else {
+					this.destMessage = String
+							.format("Account unlock for %s successful.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+			} else if (adminAction.equalsIgnoreCase("DEACTIVATE ACCOUNT")) {
+				retUpdateCust = CustomerInformation
+						.deactivateAccount(destCustInfo.getCustomerId());
+				if (!retUpdateCust) {
+					this.destMessage = String
+							.format("The system encountered problems while deactivating this number %s.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+				else {
+					this.destMessage = String
+							.format("Account deactivate for %s successful.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+			} else if (adminAction.equalsIgnoreCase("ACTIVATE ACCOUNT")) {
+				retUpdateCust = CustomerInformation
+						.deactivateAccount(destCustInfo.getCustomerId());
+				if (!retUpdateCust) {
+					this.destMessage = String
+							.format("The system encountered problems while activating this number %s.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+				else {
+					this.destMessage = String
+							.format("Account activate for %s successful.",
+									phoneMsisdn);
+					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+					return;
+				}
+			}
+
 		} catch (Exception ex) {
 			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
 					+ " TRACE: " + ex.getStackTrace());
