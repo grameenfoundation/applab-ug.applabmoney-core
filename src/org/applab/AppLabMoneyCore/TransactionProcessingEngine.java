@@ -36,6 +36,7 @@ public class TransactionProcessingEngine {
 	private CustomerInformation destCustInfo;
 
 	private String destMessage = "";
+	private UserInformation systemUserInfo;
 
 	public TransactionProcessingEngine() {
 
@@ -115,6 +116,7 @@ public class TransactionProcessingEngine {
 			} else if (requestKeyword.toUpperCase().equalsIgnoreCase("INVT")) {
 				processINVT();
 			}
+
 			// ZIMBA KEYWORDS
 			else if (requestKeyword.toUpperCase().equalsIgnoreCase("NTACTV")) {
 				processNTACTV();
@@ -128,6 +130,7 @@ public class TransactionProcessingEngine {
 				destMessage = "The service failed to determine the kind of transaction requested.";
 				HelperUtils.writeToLogFile("console", destMessage);
 				HelperUtils.writeToLogFile("OutBoundMessages", destMessage);
+
 				// send the SMS
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 			}
@@ -150,6 +153,7 @@ public class TransactionProcessingEngine {
 		String sqlQuery = "";
 
 		try {
+
 			// If the data fields are empty, return false
 			if (sourceMsisdn.trim().isEmpty() || referenceId.trim().isEmpty()
 					|| requestCommand.trim().isEmpty()) {
@@ -301,6 +305,36 @@ public class TransactionProcessingEngine {
 				isValid = true;
 				CustomerInformation.resetInvalidPinCount(this.sourceCustInfo
 						.getCustomerId());
+			}
+
+			return isValid;
+		} catch (Exception ex) {
+			HelperUtils.writeToLogFile("Server", "ERR: " + ex.getMessage()
+					+ " TRACE: " + ex.getStackTrace());
+			return false;
+		}
+	}
+
+	private boolean validateAdminPinCode(String thePinCode) {
+		boolean isValid = false;
+		int failedPinAttempts = 0;
+
+		try {
+			failedPinAttempts = this.systemUserInfo.getInvalidPinCount();
+			if (this.systemUserInfo.getPhonePinCode() == null
+					|| !this.systemUserInfo.getPhonePinCode().equalsIgnoreCase(
+							thePinCode)) {
+				failedPinAttempts++;
+
+				if (failedPinAttempts >= SystemConfigInfo
+						.getInvalidPasswordLock()) {
+					UserInformation.lockUser(this.systemUserInfo.getUserId());
+				}
+				isValid = false;
+			} else {
+				isValid = true;
+				UserInformation.resetInvalidPinCount(this.systemUserInfo
+						.getUserId());
 			}
 
 			return isValid;
@@ -3693,7 +3727,7 @@ public class TransactionProcessingEngine {
 		String[] transElements = null;
 		String phoneNumber = "";
 		String phoneMsisdn = "";
-		String adminPassword = "";
+		String phonePinCode = "";
 		String maskedPinCode = "";
 		String adminAction = "";
 		String separatorChar = " ";
@@ -3717,8 +3751,8 @@ public class TransactionProcessingEngine {
 				return;
 			}
 
-			adminPassword = transElements[3].trim();
-			maskedPinCode = HelperUtils.maskPassword(adminPassword);
+			phonePinCode = transElements[3].trim();
+			maskedPinCode = HelperUtils.maskPassword(phonePinCode);
 
 			// Swap the originalPassword with the maskedPassword
 			transElements[3] = maskedPinCode;
@@ -3737,18 +3771,26 @@ public class TransactionProcessingEngine {
 			HelperUtils.writeToLogFile("InBoundMessages", String.format(
 					"%s~%s~%s", referenceId, sourceMsisdn, originalRequest));
 
-			this.sourceCustInfo = CustomerInformation
-					.getCustomerAccountInfo(sourceMsisdn);
+			this.systemUserInfo = UserInformation.getUserInfo(sourceMsisdn);
 
-			if (!validatePinCode(adminPassword)) {
-				this.destMessage = String
-						.format("You have entered an invalid PIN. Note that 3 attempts with invalid PIN - %s will block your account PIN - %s",
-								adminPassword, sourceCustInfo.getPinCode());
+			//check if user exists and has admin rights
+			if (systemUserInfo == null){ 
+				this.destMessage = "You are not authorised to use this service";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			} else if (systemUserInfo.getAccessLevel() < 2){
+				this.destMessage = "You are not authorised to use this service";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
 
-			if (adminPassword.equalsIgnoreCase(HelperUtils.getDefaultPinCode(
+			if (!validateAdminPinCode(phonePinCode)) {
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account PIN";
+				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
+				return;
+			}
+			
+			if (phonePinCode.equalsIgnoreCase(HelperUtils.getDefaultPinCode(
 					SystemConfigInfo.getMinPasswordLen(),
 					SystemConfigInfo.getMaxPasswordLen()))) {
 				this.destMessage = "For your own security please change your PIN before doing any transactions.";
@@ -3807,8 +3849,7 @@ public class TransactionProcessingEngine {
 									phoneMsisdn);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
-				}
-				else {
+				} else {
 					this.destMessage = String
 							.format("Me2me reset for the account associated with this number %s successful.",
 									phoneMsisdn);
@@ -3818,18 +3859,17 @@ public class TransactionProcessingEngine {
 			} else if (adminAction.equalsIgnoreCase("LOCK ACCOUNT")) {
 				retUpdateCust = CustomerInformation.lockCustomer(destCustInfo
 						.getCustomerId());
-				DatabaseHelper.writeToLogFile("console", "ERR: " + retUpdateCust);
+				DatabaseHelper.writeToLogFile("console", "ERR: "
+						+ retUpdateCust);
 				if (!retUpdateCust) {
 					this.destMessage = String
 							.format("The system encountered problems while locking the account associated with this number %s.",
 									phoneMsisdn);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
-				}
-				else {
-					this.destMessage = String
-							.format("Account lock for %s successful.",
-									phoneMsisdn);
+				} else {
+					this.destMessage = String.format(
+							"Account lock for %s successful.", phoneMsisdn);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				}
@@ -3842,11 +3882,9 @@ public class TransactionProcessingEngine {
 									phoneMsisdn);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
-				}
-				else {
-					this.destMessage = String
-							.format("Account unlock for %s successful.",
-									phoneMsisdn);
+				} else {
+					this.destMessage = String.format(
+							"Account unlock for %s successful.", phoneMsisdn);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				}
@@ -3859,11 +3897,10 @@ public class TransactionProcessingEngine {
 									phoneMsisdn);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
-				}
-				else {
-					this.destMessage = String
-							.format("Account deactivate for %s successful.",
-									phoneMsisdn);
+				} else {
+					this.destMessage = String.format(
+							"Account deactivate for %s successful.",
+							phoneMsisdn);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				}
@@ -3876,11 +3913,9 @@ public class TransactionProcessingEngine {
 									phoneMsisdn);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
-				}
-				else {
-					this.destMessage = String
-							.format("Account activate for %s successful.",
-									phoneMsisdn);
+				} else {
+					this.destMessage = String.format(
+							"Account activate for %s successful.", phoneMsisdn);
 					HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 					return;
 				}
