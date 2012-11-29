@@ -1095,10 +1095,7 @@ public class TransactionProcessingEngine {
 			}
 
 			if (!validatePinCode(pinCode)) {
-				this.destMessage = "You have entered an invalid PIN. Note that "
-						+ Integer.toString(SystemConfigInfo
-								.getInvalidPasswordLock())
-						+ " attempts with invalid PIN will block your account.";
+				this.destMessage = "You have entered an invalid PIN. Note that 3 attempts with invalid PIN will block your account.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3773,12 +3770,12 @@ public class TransactionProcessingEngine {
 
 			this.systemUserInfo = UserInformation.getUserInfo(sourceMsisdn);
 
-			//check if user exists and has admin rights
-			if (systemUserInfo == null){ 
+			// check if user exists and has admin rights
+			if (systemUserInfo == null) {
 				this.destMessage = "You are not authorised to use this service";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
-			} else if (systemUserInfo.getAccessLevel() < 2){
+			} else if (systemUserInfo.getAccessLevel() < 2) {
 				this.destMessage = "You are not authorised to use this service";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
@@ -3789,7 +3786,7 @@ public class TransactionProcessingEngine {
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
-			
+
 			if (phonePinCode.equalsIgnoreCase(HelperUtils.getDefaultPinCode(
 					SystemConfigInfo.getMinPasswordLen(),
 					SystemConfigInfo.getMaxPasswordLen()))) {
@@ -3811,7 +3808,7 @@ public class TransactionProcessingEngine {
 					.getCustomerAccountInfo(phoneMsisdn);
 			if (destCustInfo == null) {
 				this.destMessage = String
-						.format("This number - %s is not registered with the system. Please contact Customer Service for more information.",
+						.format("This number - %s is not registered for me2me.",
 								phoneMsisdn);
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;

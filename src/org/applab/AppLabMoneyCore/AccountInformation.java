@@ -1,5 +1,6 @@
 package org.applab.AppLabMoneyCore;
 
+
 public class AccountInformation {
     private int accountId;
     private int customerId;

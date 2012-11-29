@@ -500,20 +500,20 @@ public class CustomerInformation {
 		String sqlQuery = "";
 
 		try {
-			
+
 			cn = DatabaseHelper.getConnection(HelperUtils.TARGET_DATABASE);
 
 			sb = new StringBuilder();
 			sb.append("UPDATE CUSTOMERS SET LOCKED_FLG= 1, LOCKED_REASON = 'INVALID PINCODE' WHERE CUSTOMER_ID = %s ");
 			sqlQuery = sb.toString();
 
-			
 			stm = cn.prepareStatement(String.format(sqlQuery,
 					Long.toString(customerId)));
 
 			// Execute the Query
 			dbStatusCode = stm.executeUpdate();
-			DatabaseHelper.writeToLogFile("console", "ERR: " + "In lock customer3");
+			DatabaseHelper.writeToLogFile("console", "ERR: "
+					+ "In lock customer3");
 			// Will work OK with SProcs
 			return ((dbStatusCode > 0) ? true : false);
 		} catch (Exception ex) {
@@ -626,6 +626,9 @@ public class CustomerInformation {
 
 			// Execute the Query
 			dbStatusCode = stm.executeUpdate();
+			if (dbStatusCode >= 0) {
+				return false;
+			}
 
 			sb.append("DELETE FROM ME2ME_GOALS WHERE CUSTOMER_ID= %s");
 			sqlQuery = sb.toString();
@@ -636,6 +639,9 @@ public class CustomerInformation {
 			// Execute the Query
 			dbStatusCode = stm.executeUpdate();
 
+			if (dbStatusCode >= 0) {
+				return false;
+			}
 			sb.append("DELETE FROM ME2ME_CUSTOMERS WHERE CUSTOMER_ID= %s");
 			sqlQuery = sb.toString();
 
@@ -712,7 +718,7 @@ public class CustomerInformation {
 			cn = DatabaseHelper.getConnection(HelperUtils.TARGET_DATABASE);
 
 			sb = new StringBuilder();
-			sb.append("UPDATE CUSTOMERS SET LOCKED_FLG = 0, LOCKED_REASON = ' ', INVALID_PIN_COUNT = 0 WHERE CUSTOMER_ID = %s ");
+			sb.append("UPDATE CUSTOMERS SET LOCKED_FLG = 0, LOCKED_REASON = NULL, INVALID_PIN_COUNT = 0 WHERE CUSTOMER_ID = %s ");
 			sqlQuery = sb.toString();
 			HelperUtils.writeToLogFile("Console", "ERR: " + "unlock");
 			stm = cn.prepareStatement(String.format(sqlQuery,
@@ -775,9 +781,8 @@ public class CustomerInformation {
 			}
 		}
 	}
-	
-	public static boolean activateAccount(long customerId)
-			throws SQLException {
+
+	public static boolean activateAccount(long customerId) throws SQLException {
 		Connection cn = null;
 		PreparedStatement stm = null;
 		StringBuilder sb = null;
