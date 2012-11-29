@@ -1284,7 +1284,7 @@ public class TransactionProcessingEngine {
 
 			int sourceAccountTypeBitmap = sourceCustInfo.getAccountTypeBitmap();
 			if ((sourceAccountTypeBitmap & (HelperUtils.BITMAP_AGNT | HelperUtils.BITMAP_DLER)) == 0) {
-				this.destMessage = "You are not allowed to use this feature. Please contact Customer Service for more information.";
+				this.destMessage = "Your account profile is not allowed to make this transaction. Please contact Customer Service for more information.";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
@@ -3771,11 +3771,7 @@ public class TransactionProcessingEngine {
 			this.systemUserInfo = UserInformation.getUserInfo(sourceMsisdn);
 
 			// check if user exists and has admin rights
-			if (systemUserInfo == null) {
-				this.destMessage = "You are not authorised to use this service";
-				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
-				return;
-			} else if (systemUserInfo.getAccessLevel() < 2) {
+			if ((systemUserInfo == null) && (systemUserInfo.getAccessLevel() < 2)) {
 				this.destMessage = "You are not authorised to use this service";
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
@@ -3807,9 +3803,9 @@ public class TransactionProcessingEngine {
 			this.destCustInfo = CustomerInformation
 					.getCustomerAccountInfo(phoneMsisdn);
 			if (destCustInfo == null) {
-				this.destMessage = String
-						.format("This number - %s is not registered for me2me.",
-								phoneMsisdn);
+				this.destMessage = String.format(
+						"This number - %s is not registered for me2me.",
+						phoneMsisdn);
 				HelperUtils.sendSMS(sourceMsisdn, destMessage, referenceId);
 				return;
 			}
