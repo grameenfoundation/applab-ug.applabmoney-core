@@ -240,7 +240,7 @@ public class SystemConfigInfo {
         setMaintenanceModeFlag(false);
         setMaintenanceModeMsgId(60001);
         setMaxPasswordLen(5);
-        setMinPasswordLen(4);
+        setMinPasswordLen(5);
         setMobileLength(9);
         setMsisdnLeadZeroRequired(false);
         setOperation("UGANDA");
